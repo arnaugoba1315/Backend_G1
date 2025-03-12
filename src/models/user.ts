@@ -42,11 +42,11 @@ const userSchema = new mongoose.Schema({
         ref: 'Achievement',
         require: true
     }],
-    challengesCompleted :{
+    challengesCompleted :[{
         type: Schema.Types.ObjectId,
         ref: 'Challenge',
         require: true
-    },
+    }],
     createdAt :{
         type: Date,
         require: true
