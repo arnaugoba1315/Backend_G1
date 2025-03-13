@@ -2,6 +2,7 @@ import mongoose, {Schema} from "mongoose";
 const userSchema = new mongoose.Schema({
     username :{
         type: String,
+        unique: true,
         require: true
     },
     password :{
@@ -10,6 +11,7 @@ const userSchema = new mongoose.Schema({
     },
     email :{
         type: String,
+        unique: true,
         require: true
     },
     profilePicture :{
@@ -22,14 +24,17 @@ const userSchema = new mongoose.Schema({
     },
     level :{
         type: Number,
+        default: 0,
         require: true
     },
     totalDistance :{
         type: Number,
+        default: 0,
         require: true
     },
     totalTime :{
         type: Number,
+        default: 0,
         require: true
     },
     activities :[{
@@ -49,10 +54,17 @@ const userSchema = new mongoose.Schema({
     }],
     createdAt :{
         type: Date,
+        default: Date.now,
         require: true
     },
     updateAt :{
         type: Date,
+        default: Date.now,
+        require: true
+    },
+    visibility :{
+        type: Boolean,
+        default: true,
         require: true
     }
 });
