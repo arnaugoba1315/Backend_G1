@@ -83,6 +83,7 @@ export interface IUser{
     challengesCompleted: mongoose.Types.ObjectId[];
     createdAt: Date;
     updatedAt: Date;
+    visibility: boolean;
 }
 
 const User = mongoose.model('User', userSchema);
