@@ -1,6 +1,7 @@
 import express from 'express';
 import connectDB from './config/db';
 import userRoutes from './routes/userRoutes';
+import setupSwagger from './config/swaggerConfig';
 // Otros imports...
 
 const app = express();
@@ -21,6 +22,8 @@ connectDB()
     console.error('Database connection failed', err);
   });
 
+// Configurar Swagger
+setupSwagger(app);
 // Rutas
 app.use('/api/users', userRoutes);
 // Otras rutas...
