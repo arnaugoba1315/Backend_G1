@@ -69,41 +69,6 @@ const userSchema = new mongoose.Schema({
     }
 });
 
-export interface IUser{
-<<<<<<< Updated upstream
-    username: string;
-    email: string;
-    password: string;
-    profilePicture?: string;
-    bio?: string;
-    level: number;
-    totalDistance: number;
-    totalTime: number;
-    activities: mongoose.Types.ObjectId[];
-    achievements: mongoose.Types.ObjectId[];
-    challengesCompleted: mongoose.Types.ObjectId[];
-    createdAt: Date;
-    updatedAt: Date;
-    visibility: boolean;
-=======
-    toObject(): {
-        _id?: string | mongoose.Types.ObjectId; // Añade esto para el ID de MongoDB
-        username: string;
-        email: string;
-        password: string;
-        profilePicture?: string;
-        bio?: string;
-        level: number;
-        totalDistance: number;
-        totalTime: number;
-        activities: mongoose.Types.ObjectId[];
-        achievements: mongoose.Types.ObjectId[];
-        challengesCompleted: mongoose.Types.ObjectId[];
-        createdAt: Date;
-        updatedAt: Date;
-    };
->>>>>>> Stashed changes
-}
 
 const User = mongoose.model('User', userSchema);
 export default User;
