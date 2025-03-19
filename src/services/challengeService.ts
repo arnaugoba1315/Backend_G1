@@ -20,7 +20,7 @@ export const challengeEntry = {
     getActiveChallenges : async()=>{
         return await challengeModel.find({endDate: {$gte: new Date()}});
     },
-    getAllchallengs : async()=>{
+    getInactiveChallenges : async()=>{
         return await challengeModel.find({endDate: {$lte: new Date()}});
     },
     addParticipant : async(userId: string, challengeId: string)=>{
