@@ -2,6 +2,7 @@ import express from 'express';
 import setupSwagger from './config/swaggerConfig';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
+import connectDatabase from './config/db';
 // Otros imports...
 
 const app = express();
@@ -12,18 +13,6 @@ setupSwagger(app);
 // Middleware
 //app.use(cors());
 app.use(express.json());
-
-// Conectar a MongoDB
-connectDB()
-  .then(() => {
-    // Iniciar el servidor una vez conectado a la base de datos
-    app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
-    });
-  })
-  .catch(err => {
-    console.error('Database connection failed', err);
-  });
 
 // Rutas
 app.use('/api/users', userRoutes);
