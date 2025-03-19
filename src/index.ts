@@ -2,6 +2,7 @@ import express from 'express';
 import setupSwagger from './config/swaggerConfig';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
+import ReferencePointRoutes from './routes/referencePointRoutes';
 import connectDatabase from './config/db';
 
 
@@ -20,6 +21,7 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/users', userRoutes);
+app.use('/api/referencePoints', ReferencePointRoutes);
 app.get('/', (req, res) => {
   res.send('API de Ejercicios tipo Strava funcionando. Visita /api-docs para la documentación');
 });
