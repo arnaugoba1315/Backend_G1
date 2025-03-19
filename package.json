@@ -1,13 +1,11 @@
 {
     "name": "backend_g1",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "src/index.js",
     "scripts": {
-        "start": "ts-node src/index.ts",
-        "dev": "nodemon src/index.ts",
+        "start": "cd .\\dist && node index.js",
         "build": "tsc",
-        "serve": "node dist/index.js",
-        "test": "echo \"Error: no test specified\" && exit 1"
+        "dev": "nodemon src/index.ts"
     },
     "keywords": [],
     "author": "",
