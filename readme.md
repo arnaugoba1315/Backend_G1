@@ -1,79 +1,41 @@
-# Api proyecto EA
+# API Projecte EA
 
-## Organización carpetas del proyecto
-Tenim una carpeta src que serà la que es compilara. Dins d'aquesta carpeta tenim 6 carpetes. 
-Config: tindrà el arxius de configuració tant de la base de dades, swagger, cors, etc.
-Controllers: es defineixen les respostes del servidor.
-Middleware
-Models: definició dels models amb interfaces i schema.
-Routes: es gestiona les peticions a la base de dades
-Services:peticions a la base de dades
+## Requisits previs
+Abans d'executar el projecte, assegura't de tenir instal·lat:
+- [Node.js](https://nodejs.org/)
+- [MongoDB](https://www.mongodb.com/)
 
+## Organització carpetes del projecte
+- Config: arxius de configuració tant de MonogDB, Swagger, CORS, etc.
+- Controllers: es defineixen les respostes del servidor
+- Middleware: anirà definit elements com JWT i OAuth 2.0
+- Models: definició dels models amb interfaces i schema.
+- Routes: es gestiona les peticions a la base de dades
+- Services: peticions a la base de dades
 
-## Instalación de dependencias
+## Instal·lació
+Clona el repositori i executa la següent comanda per instal·lar les dependències:
 
-Ejecuta los siguientes comandos para instalar todas las dependencias necesarias:
-
-### Swagger
-
-```bash
-npm i swagger-jsdoc
-npm i swagger-ui-express
-npm i @types/swagger-jsdoc -D
-npm i @types/swagger-ui-express -D
+```sh
+npm install
 ```
 
-### Express
+## Execució
+Per compilar i executar l'API:
 
-```bash
-npm i express
-npm i @types/express -D
+```sh
+npm run build
+npm run start
 ```
 
-### Mongoose
+Si es vol compilar amb nodemon:
 
-```bash
-npm i mongoose
+```sh
+npm run dev
 ```
 
-### Dotenv
-
-```bash
-npm i dotenv
+## Documentació
+Una vegada que el servidor està executat, es pot accedir a Swagger a través del següent enllaç:
 ```
-
-### Nodemon
-
-```bash
-npm i nodemon -D
+http://localhost:3143/api-docs
 ```
-
-### TypeScript 
-
-```bash
-npm i typescript -D
-npm i ts-node -D
-npm i @types/node -D
-```
-
-### Otras dependencias
-
-```bash
-npm i glob
-npm i lru-cache
-```
-
-## Scripts disponibles
-
-- **Modo desarrollo con Nodemon:**
-  ```bash
-  npm run dev
-  ```
-  Ejecuta la aplicación y reinicia automáticamente al detectar cambios.
-
-## Ejecutar sin necesidad de transpilar a JS
-
-```bash
-npm install ts-node --save-dev
-```
-Esto permite ejecutar TypeScript directamente sin necesidad de convertirlo a JavaScript manualmente.
