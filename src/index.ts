@@ -22,6 +22,8 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/users', userRoutes);
+app.use('/api/referencePoints', referencePointRoutes);
+app.use('/api/activities', activityRoutes);
 app.get('/', (req, res) => {
   res.send('API de Ejercicios tipo Strava funcionando. Visita /api-docs para la documentación');
 });
