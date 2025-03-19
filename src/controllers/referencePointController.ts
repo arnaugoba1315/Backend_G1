@@ -6,7 +6,7 @@ import {
     getReferencePointById, 
     updateReferencePoint, 
     deleteReferencePoint 
-} from '../services/referencePointService.js';
+} from '../services/referencePointService';
 
 import express, { Request, Response } from 'express';
 
