@@ -12,7 +12,7 @@ export const getAllSongs = async () => {
     return await Song.find();
 };
 
-export const getSongById = async (id:Schema.Types.ObjectId) => {
+export const getSongById = async (id:string) => {
     return await Song.findById(id);
 };
 
@@ -20,11 +20,11 @@ export const getSongByName = async (name:string) => {
     return await Song.find({title:name});
 };
 
-export const getSongByArtist = async (artist:string) => {
+export const getSongsByArtist = async (artist:string) => {
     return await Song.find({artist:artist});
 };
 
-export const getSongByGenre = async (genre:string) => {
+export const getSongsByGenre = async (genre:string) => {
     return await Song.find({genre:genre});
 };
 
@@ -33,10 +33,10 @@ export const getSymilarBpm = async (bpm:number) => {
     return songs.filter(song => song.bpm !== undefined && song.bpm !== null && Math.abs(song.bpm - bpm) < 20);
 };
 
-export const updateSong = async (id:Schema.Types.ObjectId, song:ISong) => {
+export const updateSong = async (id:string, song:ISong) => {
     return await Song.findByIdAndUpdate;
 };
 
-export const deleteSong = async (id:Schema.Types.ObjectId) => {
+export const deleteSong = async (id:string) => {
     return await Song.findByIdAndDelete(id);
 };
