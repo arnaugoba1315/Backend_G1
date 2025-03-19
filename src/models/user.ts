@@ -1,74 +1,89 @@
-import mongoose, {Schema} from "mongoose";
-const userSchema = new mongoose.Schema({
-    username :{
+import mongoose, { Schema, Types, Document } from "mongoose";
+
+// Interface for the User document
+export interface IUser extends Document {
+    _id: Types.ObjectId;
+    username: string;
+    email: string;
+    password: string;
+    profilePicture?: string;
+    bio?: string;
+    level: number;
+    totalDistance: number;
+    totalTime: number;
+    activities: Types.ObjectId[];
+    achievements: Types.ObjectId[];
+    challengesCompleted: Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
+    visibility: boolean;
+}
+
+// Schema definition
+const userSchema = new Schema({
+    username: {
         type: String,
         unique: true,
-        require: true
+        required: true
     },
-    password :{
+    password: {
         type: String,
-        require: true
+        required: true
     },
-    email :{
+    email: {
         type: String,
         unique: true,
-        require: true
+        required: true
     },
-    profilePicture :{
+    profilePicture: {
         type: String,
-        require: false
+        required: false
     },
-    bio :{
+    bio: {
         type: String,
-        require: false
+        required: false
     },
-    level :{
+    level: {
         type: Number,
         default: 0,
-        require: true
+        required: true
     },
-    totalDistance :{
+    totalDistance: {
         type: Number,
         default: 0,
-        require: true
+        required: true
     },
-    totalTime :{
+    totalTime: {
         type: Number,
         default: 0,
-        require: true
+        required: true
     },
-    activities :[{
+    activities: [{
         type: Schema.Types.ObjectId,
         ref: 'Activity',
-        require: true
+        required: true,
+        default: []
     }],
-    achievements :[{
+    achievements: [{
         type: Schema.Types.ObjectId,
         ref: 'Achievement',
-        require: true
+        required: true,
+        default: []
     }],
-    challengesCompleted :[{
+    challengesCompleted: [{
         type: Schema.Types.ObjectId,
         ref: 'Challenge',
-        require: true
+        required: true,
+        default: []
     }],
-    createdAt :{
-        type: Date,
-        default: Date.now,
-        require: true
-    },
-    updateAt :{
-        type: Date,
-        default: Date.now,
-        require: true
-    },
-    visibility :{
+    visibility: {
         type: Boolean,
         default: true,
-        require: true
+        required: true
     }
+}, {
+    timestamps: true // This automatically handles createdAt and updatedAt
 });
 
-
-const User = mongoose.model('User', userSchema);
+const User = mongoose.model<IUser>('User', userSchema);
 export default User;
