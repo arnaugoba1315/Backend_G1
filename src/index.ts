@@ -3,8 +3,12 @@ import setupSwagger from './config/swaggerConfig';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
 import connectDatabase from './config/db';
-// Otros imports...
 
+
+// Cargar variables de entorno
+dotenv.config();
+
+// Inicializar Express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
