@@ -3,7 +3,7 @@ import setupSwagger from './config/swaggerConfig';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
 import connectDatabase from './config/db';
-
+import challengeRoutes from './routes/challengeRoutes';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -20,6 +20,7 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/users', userRoutes);
+app.use('api/challenges', challengeRoutes);
 app.get('/', (req, res) => {
   res.send('API de Ejercicios tipo Strava funcionando. Visita /api-docs para la documentación');
 });
