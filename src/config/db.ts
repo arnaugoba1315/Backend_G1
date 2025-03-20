@@ -1,40 +1,39 @@
 import mongoose, { Mongoose } from "mongoose";
-import {Express} from "express";
 import dotenv from "dotenv";
 
 dotenv.config();
 
-const connectDatabase = async () => {
+const connectDatabase = async (): Promise<void> => {
     try{
         mongoose.set('strictQuery', true);
         await mongoose.connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ProyectoEA_bd');
-        console.log('Conexión exitosa a MongoDB');
-
+        console.log('Connexió exitosa amb MongoDB');
   
-// Manejadores de eventos para la conexión a MongoDB
-mongoose.connection.on('connected', () => {
-    console.log('Mongoose conectado a la base de datos');
-    });
+        // Manejadores de eventos para la conexión a MongoDB
+        mongoose.connection.on('connected', () => {
+        console.log('Mongoose connectat a la base de dades');
+        });
     
-    mongoose.connection.on('error', (err) => {
-    console.error('Error en la conexión de Mongoose:', err);
-    });
+        mongoose.connection.on('error', (err) => {
+        console.error('Error en la connexió de Mongoose:', err);
+        });
     
-    mongoose.connection.on('disconnected', () => {
-    console.log('Mongoose desconectado de la base de datos');
-    });
+        mongoose.connection.on('disconnected', () => {
+        console.log('Mongoose desconnectat de la base de dades');
+        });
     
-    // Manejador para cerrar la conexión cuando se detiene la aplicación
-    process.on('SIGINT', async () => {
-    await mongoose.connection.close();
-    console.log('Conexión de Mongoose cerrada debido a la terminación de la aplicación');
-    process.exit(0);
-    });
-}
-catch(error){
-  console.error('Error de conexión a MongoDB:', error);
-  console.error('Asegúrate de que MongoDB esté ejecutándose en tu sistema');
-}
+        // Manejador para cerrar la conexión cuando se detiene la aplicación
+        process.on('SIGINT', async () => {
+        await mongoose.connection.close();
+        console.log('Connexió de Mongoose tancada degut a la finalització del programa');
+        process.exit(0);
+        });
+      }
+    catch(error){
+      console.error('Error de connexió amb MongoDB:', error);
+      console.error("Assegura't de que MongoDB s'està executant en el sistema");
+      throw error;
+    }
 };
 
 export default connectDatabase;
