@@ -196,22 +196,34 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 };
 
 /**
- * Eliminar un usuario
+ * Soft delete - Marcar usuario como no visible en lugar de eliminarlo
  */
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try {
     const userId = req.params.id;
     
-    const deletedUser = await User.findByIdAndDelete(userId);
+    // En lugar de eliminar, actualizar el campo visible a false
+    const updatedUser = await User.findByIdAndUpdate(
+      userId,
+      { visible: false, updatedAt: new Date() },
+      { new: true }
+    );
     
-    if (!deletedUser) {
-      res.status(404).json({ message: 'User not found' });
+    if (!updatedUser) {
+      res.status(404).json({ message: 'Usuario no encontrado' });
       return;
     }
     
-    res.status(200).json({ message: 'User deleted successfully' });
+    res.status(200).json({ 
+      message: 'Usuario marcado como no visible correctamente',
+      user: {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        visible: updatedUser.visibility
+      }
+    });
   } catch (error) {
-    console.error('Error deleting user:', error);
-    res.status(500).json({ message: 'Error deleting user' });
+    console.error('Error al ocultar usuario:', error);
+    res.status(500).json({ message: 'Error al ocultar usuario' });
   }
 };

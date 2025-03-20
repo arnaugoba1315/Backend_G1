@@ -85,5 +85,19 @@ const userSchema = new Schema({
     timestamps: true // This automatically handles createdAt and updatedAt
 });
 
+// No mostrar usuarios invisibles por defecto
+userSchema.pre('find', function() {
+    this.where({ visible: { $ne: false } });
+  });
+  
+  userSchema.pre('findOne', function() {
+    this.where({ visible: { $ne: false } });
+  });
+  
+  // Asegurarse de que el campo updatedAt se actualiza
+  userSchema.pre('findOneAndUpdate', function() {
+    this.set({ updatedAt: new Date() });
+  });
+
 const User = mongoose.model<IUser>('User', userSchema);
 export default User;
