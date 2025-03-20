@@ -1,4 +1,4 @@
-import mongoose, {ObjectId,Schema, model, Types}from "mongoose"
+import mongoose, {ObjectId,Schema, model, Types} from "mongoose"
 
 export interface IAchievement {
     

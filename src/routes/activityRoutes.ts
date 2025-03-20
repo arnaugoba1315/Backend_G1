@@ -4,7 +4,7 @@ import * as activityController from '../controllers/activityController';
 const router = express.Router();
 
 /**
- * @swagger
+ * @openapi
  * /api/activities:
  *   post:
  *     summary: Create a new activity associated with a user
@@ -61,7 +61,7 @@ const router = express.Router();
 router.post('/', activityController.createActivityController);
 
 /**
- * @swagger
+ * @openapi
  * /api/activities/{id}:
  *   get:
  *     summary: Get an activity by ID
@@ -82,7 +82,7 @@ router.post('/', activityController.createActivityController);
 router.get('/:id', activityController.getActivityByIdController);
 
 /**
- * @swagger
+ * @openapi
  * /api/activities/user/{userId}:
  *   get:
  *     summary: Get all activities by user ID
@@ -101,7 +101,7 @@ router.get('/:id', activityController.getActivityByIdController);
 router.get('/user/:userId', activityController.getActivitiesByUserIdController);
 
 /**
- * @swagger
+ * @openapi
  * /api/activities:
  *   get:
  *     summary: Get all activities
@@ -113,7 +113,7 @@ router.get('/user/:userId', activityController.getActivitiesByUserIdController);
 router.get('/', activityController.getAllActivitiesController);
 
 /**
- * @swagger
+ * @openapi
  * /api/activities/{id}:
  *   put:
  *     summary: Update an activity by ID
@@ -169,7 +169,7 @@ router.get('/', activityController.getAllActivitiesController);
 router.put('/:id', activityController.updateActivityController);
 
 /**
- * @swagger
+ * @openapi
  * /api/activities/{id}:
  *   delete:
  *     summary: Delete an activity by ID
