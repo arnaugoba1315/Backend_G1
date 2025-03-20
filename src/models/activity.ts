@@ -1,4 +1,4 @@
-import mongoose, {Schema, model, Types}from "mongoose"
+import mongoose, {Schema, model, Types} from "mongoose"
 
 export const activitySchema = new Schema<IActivity>({
     author: { 

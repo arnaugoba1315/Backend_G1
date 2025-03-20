@@ -1,5 +1,4 @@
 import Song, {ISong} from '../models/song';
-import {Schema} from 'mongoose';
 
 
 export const createSong = async (song:ISong) => {

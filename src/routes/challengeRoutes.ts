@@ -1,9 +1,10 @@
 import express from 'express';
 import * as challengeController from '../controllers/challengeController';
+
 const router = express.Router();
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges:
  *   post:
  *     summary: Crea un nuevo challenge
@@ -87,7 +88,7 @@ const router = express.Router();
 router.post('/', challengeController.createChallengeController);
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges/{id}:
  *   get:
  *     summary: Obtener un challenge por su ID
@@ -155,7 +156,7 @@ router.post('/', challengeController.createChallengeController);
 router.get('/:id', challengeController.getChallengeByIdController);
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges/:
  *   get:
  *     summary: Obtener un challenge por su ID
@@ -214,7 +215,7 @@ router.get('/:id', challengeController.getChallengeByIdController);
 router.get('/', challengeController.getAllChallengesController);
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges/active:
  *   get:
  *     summary: Obtener todos los challenges activos
@@ -286,7 +287,7 @@ router.get('/', challengeController.getAllChallengesController);
 router.get('/active', challengeController.getActiveChallengesController);
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges/inactive:
  *   get:
  *     summary: Obtener todos los challenges inactivos
@@ -358,7 +359,7 @@ router.get('/active', challengeController.getActiveChallengesController);
 router.get('/inactive', challengeController.getInactiveChallengesController);
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges/{id}:
  *   put:
  *     summary: Actualizar un challenge existente
@@ -457,7 +458,7 @@ router.put('/:id', challengeController.updateChallengeController);
 
 
 /**
- * @swagger
+ * @openapi
  * /api/challenges/{id}:
  *   delete:
  *     summary: Eliminar un challenge

@@ -4,7 +4,7 @@ import * as songController from '../controllers/songController';
 const router = express.Router();
 
 /**
- * @swagger
+ * @openapi
  * /api/songs:
  *   post:
  *     summary: Crea una nueva canción
@@ -45,7 +45,7 @@ const router = express.Router();
 router.post('/', songController.createSongHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs:
  *   get:
  *     summary: Obtiene todas las canciones
@@ -61,7 +61,7 @@ router.post('/', songController.createSongHandler);
 router.get('/', songController.getAllSongsHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs/{id}:
  *   get:
  *     summary: Obtiene una canción por su ID
@@ -84,7 +84,7 @@ router.get('/', songController.getAllSongsHandler);
 router.get('/:id', songController.getSongByIdHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs/name/{name}:
  *   get:
  *     summary: Obtiene una canción por su nombre
@@ -107,7 +107,7 @@ router.get('/:id', songController.getSongByIdHandler);
 router.get('/name/:name', songController.getSongByNameHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs/artist/{artist}:
  *   get:
  *     summary: Obtiene lista de canciones de un artista
@@ -130,7 +130,7 @@ router.get('/name/:name', songController.getSongByNameHandler);
 router.get('/artist/:artist', songController.getSongsByArtistHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs/genre/{genre}:
  *   get:
  *     summary: Obtiene lista de canciones de un género
@@ -153,7 +153,7 @@ router.get('/artist/:artist', songController.getSongsByArtistHandler);
 router.get('/genre/:genre', songController.getSongsByGenreHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs/bpm/{bpm}:
  *   get:
  *     summary: Obtiene lista de canciones con un ritmo similar
@@ -219,7 +219,7 @@ router.get('/bpm/:bpm', songController.getSymilarBpmHandler);
 router.put('/:id', songController.updateSongHandler);
 
 /**
- * @swagger
+ * @openapi
  * /api/songs/{id}:
  *   delete:
  *     summary: Elimina una canción por su ID

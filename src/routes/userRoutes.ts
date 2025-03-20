@@ -4,7 +4,7 @@ import * as userController from '../controllers/userController';
 const router = express.Router();
 
 /**
- * @swagger
+ * @openapi
  * /api/users:
  *   post:
  *     summary: Create a new user
@@ -41,7 +41,7 @@ const router = express.Router();
 router.post('/', userController.createUser);
 
 /**
- * @swagger
+ * @openapi
  * /api/users/login:
  *   post:
  *     summary: User login
@@ -71,7 +71,7 @@ router.post('/', userController.createUser);
 router.post('/login', userController.loginUser);
 
 /**
- * @swagger
+ * @openapi
  * /api/users:
  *   get:
  *     summary: Get users with pagination
@@ -100,7 +100,7 @@ router.post('/login', userController.loginUser);
 router.get('/', userController.getAllUsers);
 
 /**
- * @swagger
+ * @openapi
  * /api/users/{id}:
  *   get:
  *     summary: Get user by ID
@@ -123,7 +123,7 @@ router.get('/', userController.getAllUsers);
 router.get('/:id', userController.getUserById);
 
 /**
- * @swagger
+ * @openapi
  * /api/users/{id}:
  *   put:
  *     summary: Update user
@@ -163,7 +163,7 @@ router.get('/:id', userController.getUserById);
 router.put('/:id', userController.updateUser);
 
 /**
- * @swagger
+ * @openapi
  * /api/users/{id}:
  *   delete:
  *     summary: Delete user

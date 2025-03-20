@@ -1,13 +1,14 @@
 import {Router} from 'express';
 import * as achievementController from '../controllers/achievementController';
+
 const router = Router();
 
 /**
- * @swagger
+ * @openapi
  * /api/achievements:
  *   post:
  *     summary: Crear un nuevo logro
- *     tags: [Achievement]
+ *     tags: [Achievements]
  *     requestBody:
  *       required: true
  *       content:
@@ -100,11 +101,11 @@ const router = Router();
 router.post('/', achievementController.createAchievementController);
 
 /**
- * @swagger
+ * @openapi
  * /api/achievements/{id}:
  *   get:
  *     summary: Obtener un logro por su ID
- *     tags: [Achievement]
+ *     tags: [Achievements]
  *     parameters:
  *       - in: path
  *         name: id
@@ -170,11 +171,11 @@ router.post('/', achievementController.createAchievementController);
 router.get('/:id', achievementController.getAchievementbyIdController);
 
 /**
- * @swagger
+ * @openapi
  * /api/achievements:
  *   get:
  *     summary: Obtener todos los logros
- *     tags: [Achievement]
+ *     tags: [Achievements]
  *     responses:
  *       200:
  *         description: Lista de logros obtenida exitosamente
@@ -202,7 +203,7 @@ router.get('/:id', achievementController.getAchievementbyIdController);
  *                       title:
  *                         type: string
  *                         description: Título del logro
- *                         example: "Primer Kilometro"
+ *                         example: "Primer quilòmetre"
  *                       description:
  *                         type: string
  *                         description: Descripción del logro
@@ -245,11 +246,11 @@ router.get('/:id', achievementController.getAchievementbyIdController);
 router.get('/', achievementController.getAllAchievementController);
 
 /**
- * @swagger
+ * @openapi
  * /api/achievements/{id}:
  *   put:
  *     summary: Actualizar un logro existente
- *     tags: [Achievement]
+ *     tags: [Achievements]
  *     parameters:
  *       - in: path
  *         name: id
@@ -343,11 +344,11 @@ router.get('/', achievementController.getAllAchievementController);
 router.put('/:id', achievementController.updateAchievementController);
 
 /**
- * @swagger
+ * @openapi
  * /api/achievements/{id}:
  *   delete:
  *     summary: Eliminar un logro
- *     tags: [Achievement]
+ *     tags: [Achievements]
  *     parameters:
  *       - in: path
  *         name: id

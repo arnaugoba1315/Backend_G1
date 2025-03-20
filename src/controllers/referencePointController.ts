@@ -1,5 +1,3 @@
-// src/controllers/referencePoint_controller.ts
-
 import { 
     addReferencePoint, 
     getReferencePointById, 

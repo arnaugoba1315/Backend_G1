@@ -4,7 +4,7 @@ import * as referencePointController from '../controllers/referencePointControll
 const router = express.Router();
 
 /**
- * @swagger
+ * @openapi
  * /api/referencepoints:
  *   post:
  *     summary: Create a new reference point
@@ -36,7 +36,7 @@ router.post('/', referencePointController.addReferencePointController);
 
 
 /**
- * @swagger
+ * @openapi
  * /api/referencepoints/{id}:
  *   get:
  *     summary: Get a reference point by ID
@@ -59,7 +59,7 @@ router.post('/', referencePointController.addReferencePointController);
 router.get('/:id', referencePointController.getReferencePointByIdController);
 
 /**
- * @swagger
+ * @openapi
  * /api/referencepoints/{id}:
  *   put:
  *     summary: Update a reference point
@@ -95,7 +95,7 @@ router.get('/:id', referencePointController.getReferencePointByIdController);
 router.put('/:id', referencePointController.updateReferencePointController);
 
 /**
- * @swagger
+ * @openapi
  * /api/referencepoints/{id}:
  *   delete:
  *     summary: Delete a reference point
