@@ -13,8 +13,16 @@ import express, { Request, Response } from 'express';
 // Crear un nou punt de referència
 export const addReferencePointHandler = async (req: Request, res: Response) => {
     try {
-        const data = await addReferencePoint(req.body);
-        res.json(data);
+        if (!req.body){
+            res.status(400).json({message: "Content can not be empty!"});
+        }
+        const { activity, latitude, longitude, timestamp } = req.body;
+        if (!activity || !latitude || !longitude || !timestamp) {
+            res.status(400).json({message: "There are missing fields"});
+        }
+        const newPoint = await addReferencePoint(req.body);
+        res.json(newPoint);
+        res.status(201).json({message: "New reference point created"});
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
@@ -23,8 +31,12 @@ export const addReferencePointHandler = async (req: Request, res: Response) => {
 // Obtenir un punt de referència per ID
 export const getReferencePointByIdHandler = async (req: Request, res: Response) => {
     try {
-        const data = await getReferencePointById(req.params.id);
-        res.json(data);
+        const getPoint = await getReferencePointById(req.params.id);
+        if (!getPoint) {
+            res.status(404).json({ message: "Not found" });
+        }
+
+        res.status(200).json(getPoint);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
@@ -33,8 +45,11 @@ export const getReferencePointByIdHandler = async (req: Request, res: Response) 
 // Actualitzar un punt de referència
 export const updateReferencePointHandler = async (req: Request, res: Response) => {
     try {
-        const data = await updateReferencePoint(req.params.id, req.body);
-        res.json(data);
+        const updatePoint = await updateReferencePoint(req.params.id, req.body);
+        if(!updatePoint){
+            res.status(404).json({ message: "Not found" });
+        }
+        res.status(200).json(updatePoint);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }
