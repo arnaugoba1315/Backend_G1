@@ -74,11 +74,26 @@ router.post('/login', userController.loginUser);
  * @swagger
  * /api/users:
  *   get:
- *     summary: Get all users
+ *     summary: Get users with pagination
  *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: page
+ *         schema:
+ *           type: integer
+ *           default: 1
+ *         description: Page number
+ *       - in: query
+ *         name: limit
+ *         schema:
+ *           type: integer
+ *           default: 10
+ *         description: Number of users per page
  *     responses:
  *       200:
- *         description: List of all users
+ *         description: List of users with pagination metadata
+ *       400:
+ *         description: Invalid pagination parameters
  *       500:
  *         description: Error fetching users
  */

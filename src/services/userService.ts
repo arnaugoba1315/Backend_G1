@@ -2,6 +2,37 @@ import User, { IUser } from '../models/user';
 import mongoose from 'mongoose';
 
 /**
+ * Obtener usuarios con paginación
+ */
+export const getPaginatedUsers = async (page: number = 1, limit: number = 10): Promise<{
+  users: IUser[];
+  totalUsers: number;
+  totalPages: number;
+  currentPage: number;
+}> => {
+  // Calcular cuántos documentos saltar
+  const skip = (page - 1) * limit;
+  
+  // Buscar usuarios con paginación
+  const users = await User.find()
+    .skip(skip)
+    .limit(limit)
+    .select('-password');
+  
+  // Contar total de documentos para la información de paginación
+  const totalUsers = await User.countDocuments();
+  
+  // Calcular total de páginas
+  const totalPages = Math.ceil(totalUsers / limit);
+  
+  return {
+    users,
+    totalUsers,
+    totalPages,
+    currentPage: page
+  };
+};
+/**
  * Crear un nuevo usuario
  */
 export const createUser = async (userData: IUser): Promise<IUser> => {
