@@ -5,9 +5,57 @@ const router = express.Router();
 
 /**
  * @openapi
+ * components:
+ *   schemas:
+ *     Challenge:
+ *       type: object
+ *       required:
+ *         - title
+ *         - description
+ *         - goalType
+ *         - goalValue
+ *         - reward
+ *         - startDate
+ *         - endDate
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: El títol del repte
+ *         description:
+ *           type: string
+ *           description: La descripció del repte
+ *         goalType:
+ *           type: string
+ *           description: El tipus d'objectiu a batre (distància, temps, velocitat)
+ *         goalValue:
+ *           type: string
+ *           description: El valor numèric de l'objectiu a batre ("5 km", "10 min", "20 km/h")
+ *         reward:
+ *           type: number
+ *           description: Els punts d'experiència que aporta completar el repte
+ *         startDate:
+ *           type: string
+ *           format: date-time
+ *           description: El dia que comença el repte
+ *         endDate:
+ *           type: string
+ *           format: date-time
+ *           description: El dia que acaba el repte
+ *       example:
+ *         title: "5K Run Challenge"
+ *         description: "Completa una ruta de 5 quilòmetres"
+ *         goalType: "distance"
+ *         goalValue: "5 km"
+ *         reward: 100
+ *         startDate: "2025-04-01T00:00:00Z"
+ *         endDate: "2025-04-30T23:59:59Z"
+ */
+
+/**
+ * @openapi
  * /api/challenges:
  *   post:
- *     summary: Crea un nuevo challenge
+ *     summary: Crea un nou repte
  *     tags: [Challenges]
  *     requestBody:
  *       required: true
