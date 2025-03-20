@@ -10,7 +10,7 @@ import {
 import { Request, Response } from 'express';
 
 // Crear una nova activitat
-export const createActivityHandler = async (req: Request, res: Response) => {
+export const createActivityController = async (req: Request, res: Response) => {
     try {
         const data = await createActivity(req.body.userId, req.body);
         res.status(201).json(data);
@@ -19,7 +19,7 @@ export const createActivityHandler = async (req: Request, res: Response) => {
     }
 };
 
-export const getActivityByIdHandler = async (req: Request, res: Response) => {
+export const getActivityByIdController = async (req: Request, res: Response) => {
     try {
         const data = await getActivityById(req.params.id);
         res.json(data);
@@ -29,7 +29,7 @@ export const getActivityByIdHandler = async (req: Request, res: Response) => {
     }
 };
 
-export const getActivitiesByUserIdHandler = async (req: Request, res: Response) => {
+export const getActivitiesByUserIdController = async (req: Request, res: Response) => {
     try {
         const data = await getActivitiesByUserId(req.params.userId);
         res.json(data);
@@ -40,7 +40,7 @@ export const getActivitiesByUserIdHandler = async (req: Request, res: Response) 
 };
 
 // Obtenir totes les activitats
-export const getAllActivitiesHandler = async (req: Request, res: Response) => {
+export const getAllActivitiesController = async (req: Request, res: Response) => {
     try {
         const data = await getAllActivities();
         res.json(data);
@@ -51,7 +51,7 @@ export const getAllActivitiesHandler = async (req: Request, res: Response) => {
 
 
 // Actualitzar una activitat
-export const updateActivityHandler = async (req: Request, res: Response) => {
+export const updateActivityController = async (req: Request, res: Response) => {
     try {
         const data = await updateActivity(req.params.id, req.body);
         res.json(data);
@@ -61,7 +61,7 @@ export const updateActivityHandler = async (req: Request, res: Response) => {
 };
 
 // Eliminar una activitat
-export const deleteActivityHandler = async (req: Request, res: Response) => {
+export const deleteActivityController = async (req: Request, res: Response) => {
     try {
         const data = await deleteActivity(req.params.id);
         res.json(data);

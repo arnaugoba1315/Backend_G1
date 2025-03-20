@@ -20,8 +20,3 @@ export const updateReferencePoint = async (id: string, updateData: Partial<IRefe
 export const deleteReferencePoint = async (id: string) => {
     return await ReferencePoint.deleteOne({ _id: id });
 };
-
-//obtenir tots els punts de referència d'una activitat
-export const getReferencePointsByActivity = async (activityId: string) => {
-    return await ReferencePoint.find({ activity: activityId }).sort({ timestamp: 1 });
-};

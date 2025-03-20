@@ -16,17 +16,19 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - userId
+ *               - author
  *               - name
  *               - startTime
  *               - endTime
  *               - duration
  *               - distance
+ *               - elevationGain
  *               - averageSpeed
+ *               - route
  *               - type
  *             properties:
- *               userId:
- *                 type: string
+ *               author:
+ *                 type: objectId
  *                 description: The ID of the user who created the activity
  *               name:
  *                 type: string
@@ -40,8 +42,15 @@ const router = express.Router();
  *                 type: number
  *               distance:
  *                 type: number
+ *               elevationGain:
+ *                 type: number
  *               averageSpeed:
  *                 type: number
+ *               route:
+ *                 type: array
+ *                 items: 
+ *                   referencePoint:
+ *                     type: objectId
  *               type:
  *                 type: string
  *                 enum: [running, cycling, hiking, walking]
@@ -49,7 +58,7 @@ const router = express.Router();
  *       201:
  *         description: Activity created successfully
  */
-router.post('/', activityController.createActivityHandler);
+router.post('/', activityController.createActivityController);
 
 /**
  * @swagger
@@ -70,7 +79,7 @@ router.post('/', activityController.createActivityHandler);
  *       404:
  *         description: Activity not found
  */
-router.get('/:id', activityController.getActivityByIdHandler);
+router.get('/:id', activityController.getActivityByIdController);
 
 /**
  * @swagger
@@ -89,7 +98,7 @@ router.get('/:id', activityController.getActivityByIdHandler);
  *       200:
  *         description: List of activities
  */
-router.get('/user/:userId', activityController.getActivitiesByUserIdHandler);
+router.get('/user/:userId', activityController.getActivitiesByUserIdController);
 
 /**
  * @swagger
@@ -101,7 +110,7 @@ router.get('/user/:userId', activityController.getActivitiesByUserIdHandler);
  *       200:
  *         description: List of all activities
  */
-router.get('/', activityController.getAllActivitiesHandler);
+router.get('/', activityController.getAllActivitiesController);
 
 /**
  * @swagger
@@ -139,6 +148,11 @@ router.get('/', activityController.getAllActivitiesHandler);
  *                 type: number
  *               averageSpeed:
  *                 type: number
+ *               route:
+ *                 type: array
+ *                 items: 
+ *                   referencePoint:
+ *                     type: objectId
  *               caloriesBurned:
  *                 type: number
  *               type:
@@ -152,7 +166,7 @@ router.get('/', activityController.getAllActivitiesHandler);
  *       500:
  *         description: Error updating activity
  */
-router.put('/:id', activityController.updateActivityHandler);
+router.put('/:id', activityController.updateActivityController);
 
 /**
  * @swagger
@@ -175,6 +189,6 @@ router.put('/:id', activityController.updateActivityHandler);
  *       500:
  *         description: Error deleting activity
  */
-router.delete('/:id', activityController.deleteActivityHandler);
+router.delete('/:id', activityController.deleteActivityController);
 
 export default router;

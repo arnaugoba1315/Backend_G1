@@ -35,7 +35,7 @@ export const updateActivity = async (activityId: string, activityData: Partial<I
 export const deleteActivity = async (activityId: string): Promise<IActivity | null> => {
     const activity = await Activity.findByIdAndDelete(activityId);
     if (activity) {
-        await User.findByIdAndUpdate(activity.user, { $pull: { activities: activityId } });
+        await User.findByIdAndUpdate(activity.author, { $pull: { activities: activityId } });
     }
     return activity;
 };

@@ -2,40 +2,40 @@
 
 import { 
     addReferencePoint, 
-    getReferencePointsByActivity, 
     getReferencePointById, 
     updateReferencePoint, 
     deleteReferencePoint 
 } from '../services/referencePointService';
 
-import express, { Request, Response } from 'express';
+import { Request, Response } from 'express';
 
 // Crear un nou punt de referència
-export const addReferencePointHandler = async (req: Request, res: Response) => {
+export const addReferencePointController = async (req: Request, res: Response) => {
     try {
         if (!req.body){
             res.status(400).json({message: "Content can not be empty!"});
         }
-        const { activity, latitude, longitude, timestamp } = req.body;
-        if (!activity || !latitude || !longitude || !timestamp) {
+        const { latitude, longitude, altitude } = req.body;
+        if (!latitude || !longitude || !altitude) {
             res.status(400).json({message: "There are missing fields"});
         }
         const newPoint = await addReferencePoint(req.body);
-        res.json(newPoint);
+        console.log("New reference point created:", newPoint);
         res.status(201).json({message: "New reference point created"});
     } catch (error: any) {
+        console.log("Error creating reference point:", error);
         res.status(500).json({ message: error.message });
     }
 };
 
 // Obtenir un punt de referència per ID
-export const getReferencePointByIdHandler = async (req: Request, res: Response) => {
+export const getReferencePointByIdController = async (req: Request, res: Response) => {
     try {
         const getPoint = await getReferencePointById(req.params.id);
         if (!getPoint) {
             res.status(404).json({ message: "Not found" });
         }
-
+        console.log("Reference point obtained: ", getPoint);
         res.status(200).json(getPoint);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
@@ -43,7 +43,7 @@ export const getReferencePointByIdHandler = async (req: Request, res: Response) 
 };
 
 // Actualitzar un punt de referència
-export const updateReferencePointHandler = async (req: Request, res: Response) => {
+export const updateReferencePointController = async (req: Request, res: Response) => {
     try {
         const updatePoint = await updateReferencePoint(req.params.id, req.body);
         if(!updatePoint){
@@ -56,20 +56,13 @@ export const updateReferencePointHandler = async (req: Request, res: Response) =
 };
 
 // Eliminar un punt de referència
-export const deleteReferencePointHandler = async (req: Request, res: Response) => {
+export const deleteReferencePointController = async (req: Request, res: Response) => {
     try {
         const data = await deleteReferencePoint(req.params.id);
-        res.json(data);
-    } catch (error: any) {
-        res.status(500).json({ message: error.message });
-    }
-};
-
-// Obtenir tots els punts d'una activitat
-export const getReferencePointsByActivityHandler = async (req: Request, res: Response) => {
-    try {
-        const data = await getReferencePointsByActivity(req.params.activityId);
-        res.json(data);
+        if(!data){
+            res.status(404).json({ message: "Not found" });
+        }
+        res.status(200).json(data);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
     }

@@ -16,23 +16,15 @@ const router = express.Router();
  *           schema:
  *             type: object
  *             required:
- *               - activity
  *               - latitude
  *               - longitude
- *               - timestamp
+ *               - altitude
  *             properties:
- *               activity:
- *                 type: string
  *               latitude:
  *                 type: number
  *               longitude:
  *                 type: number
- *               timestamp:
- *                 type: string
- *                 format: date-time
  *               altitude:
- *                 type: number
- *               heartRate:
  *                 type: number
  *     responses:
  *       201:
@@ -40,7 +32,7 @@ const router = express.Router();
  *       500:
  *         description: Error creating reference point
  */
-router.post('/', referencePointController.addReferencePointHandler);
+router.post('/', referencePointController.addReferencePointController);
 
 
 /**
@@ -64,7 +56,7 @@ router.post('/', referencePointController.addReferencePointHandler);
  *       500:
  *         description: Error fetching reference point
  */
-router.get('/:id', referencePointController.getReferencePointByIdHandler);
+router.get('/:id', referencePointController.getReferencePointByIdController);
 
 /**
  * @swagger
@@ -90,12 +82,7 @@ router.get('/:id', referencePointController.getReferencePointByIdHandler);
  *                 type: number
  *               longitude:
  *                 type: number
- *               timestamp:
- *                 type: string
- *                 format: date-time
  *               altitude:
- *                 type: number
- *               heartRate:
  *                 type: number
  *     responses:
  *       200:
@@ -105,7 +92,7 @@ router.get('/:id', referencePointController.getReferencePointByIdHandler);
  *       500:
  *         description: Error updating reference point
  */
-router.put('/:id', referencePointController.updateReferencePointHandler);
+router.put('/:id', referencePointController.updateReferencePointController);
 
 /**
  * @swagger
@@ -128,27 +115,6 @@ router.put('/:id', referencePointController.updateReferencePointHandler);
  *       500:
  *         description: Error deleting reference point
  */
-router.delete('/:id', referencePointController.deleteReferencePointHandler);
-
-/**
- * @swagger
- * /api/referencepoints/activity/{activityId}:
- *   get:
- *     summary: Get all reference points for an activity
- *     tags: [ReferencePoints]
- *     parameters:
- *       - in: path
- *         name: activityId
- *         required: true
- *         schema:
- *           type: string
- *         description: Activity ID
- *     responses:
- *       200:
- *         description: List of reference points
- *       500:
- *         description: Error fetching reference points
- */
-router.get('/activity/:activityId', referencePointController.getReferencePointsByActivityHandler);
+router.delete('/:id', referencePointController.deleteReferencePointController);
 
 export default router;

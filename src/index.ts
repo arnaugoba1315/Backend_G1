@@ -8,6 +8,8 @@ import achievementRoutes from './routes/achievementRoutes';
 import challengeRoutes from './routes/challengeRoutes';
 import songRoutes from './routes/songRoutes';
 import { corsHandler } from './middleware/corsHandler';
+import dotenv from 'dotenv';
+import setupSwagger from './config/swaggerConfig';
 
 //Carregar variables d'entorn
 dotenv.config();

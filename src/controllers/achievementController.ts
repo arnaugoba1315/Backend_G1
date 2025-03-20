@@ -2,7 +2,7 @@ import { Request,Response } from "express";
 import { achievementEntry } from "../services/achievementService";
 import { IAchievement } from "../models/achievement";
 
-export const createAchievement = async(req: Request, res: Response)=>{
+export const createAchievementController = async(req: Request, res: Response)=>{
     try{
         if(!req.body){
             res.status(400).json({message: "Los datos del logro son requeridos"});
@@ -30,7 +30,7 @@ export const createAchievement = async(req: Request, res: Response)=>{
     }
 };
 
-export const getAchievementbyId = async(req: Request, res: Response)=>{
+export const getAchievementbyIdController = async(req: Request, res: Response)=>{
     try{
         const achievementId = await achievementEntry.getAchievementbyId(req.params.id);
 
@@ -44,7 +44,7 @@ export const getAchievementbyId = async(req: Request, res: Response)=>{
     }    
 };
 
-export const getAllAchievement = async(req: Request, res: Response)=>{
+export const getAllAchievementController = async(req: Request, res: Response)=>{
     try{
         const achievement = await achievementEntry.getAllAchievement();
 
@@ -62,20 +62,20 @@ export const getAllAchievement = async(req: Request, res: Response)=>{
     }
 };
 
-export const updateAchievement = async(req: Request, res: Response)=>{
+export const updateAchievementController = async(req: Request, res: Response)=>{
     try{
         const updatedAchievement = await achievementEntry.updateAchievement(req.params.id, req.body);
 
         if(!updatedAchievement){
             res.status(404).json({message: "No se encontró el logro"});
         }
-        res.status(200).json(updateAchievement);
+        res.status(200).json(updateAchievementController);
     } catch(error){
         res.status(500).json({message: "Error al actualizar el logro", error});
     }
 };
 
-export const deleteAchievement = async(req: Request, res: Response)=>{
+export const deleteAchievementController = async(req: Request, res: Response)=>{
     try{
         await achievementEntry.deleteAchievement(req.params.id);
         res.status(200).json({message: "Logro eliminado exitosamente"});

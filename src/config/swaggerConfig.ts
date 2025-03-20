@@ -28,7 +28,7 @@ const swaggerOptions = { //Configuració general de Swagger
         description: 'Rutes relacionades amb les activitats',
       },
       {
-        name: 'Reference Points',
+        name: 'ReferencePoints',
         description: 'Rutes relacionades amb els punts de referència',
       },
       {

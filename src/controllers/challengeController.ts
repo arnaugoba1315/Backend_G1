@@ -1,19 +1,26 @@
+
+import {
+    createChallenge,
+    getChallengeById,
+    getAllChallenges,
+    updateChallenge,
+    deleteChallenge,
+    getActiveChallenges,
+    getInactiveChallenges
+} from "../services/challengeService";
 import { Request,Response } from "express";
-import { challengeEntry } from "../services/challengeService";
 
-
-export const createChallenge = async(req: Request, res: Response)=>{
+export const createChallengeController = async(req: Request, res: Response)=>{
     try{
         if(!req.body){
             res.status(400).json({message: "Los datos del challenge son requeridos"});
         }
-
         const { title, description, goalType, goalValue, reward, startDate, endDate } = req.body;
         if (!title || !description || !goalType || !goalValue || !reward || !startDate || !endDate) {
             res.status(400).json({ message: "Faltan campos requeridos" });
         }
 
-        const newChallenge = await challengeEntry.createChallenge(req.body);
+        const newChallenge = await createChallenge(req.body);
         console.log("Challenge creado:", newChallenge);
 
         res.status(201).json({message: "Challenge creado exitosamente"});
@@ -23,9 +30,9 @@ export const createChallenge = async(req: Request, res: Response)=>{
     }
 };
 
-export const getChallengeById = async(req: Request, res: Response)=>{
+export const getChallengeByIdController = async(req: Request, res: Response)=>{
     try{
-        const challengeId = await challengeEntry.getChallengeById(req.params.id);
+        const challengeId = await getChallengeById(req.params.id);
 
        if(!challengeId){
             res.status(404).json({message: "No se encontró el challenge"});
@@ -37,9 +44,9 @@ export const getChallengeById = async(req: Request, res: Response)=>{
     }    
 };
 
-export const getAllChallenges = async(req: Request, res: Response)=>{
+export const getAllChallengesController = async(req: Request, res: Response)=>{
     try{
-        const challenges = await challengeEntry.getAllChallenges();
+        const challenges = await getAllChallenges();
 
         if(challenges.length === 0){
             res.status(404).json({message: "No se encontraron challenges"});
@@ -55,9 +62,9 @@ export const getAllChallenges = async(req: Request, res: Response)=>{
     }
 };
 
-export const getActiveChallenges = async(req: Request, res: Response)=>{
+export const getActiveChallengesController = async(req: Request, res: Response)=>{
     try{
-        const activeChallenges = await challengeEntry.getActiveChallenges();
+        const activeChallenges = await getActiveChallenges();
         console.log("Challenge activos: ", activeChallenges);
         res.status(200).json({message: "Challenges activos obtenidos con éxito",challenges: activeChallenges});
     } catch(error){
@@ -66,9 +73,9 @@ export const getActiveChallenges = async(req: Request, res: Response)=>{
     }
 };
 
-export const getInactiveChallenges = async(req: Request, res: Response)=>{
+export const getInactiveChallengesController = async(req: Request, res: Response)=>{
     try{
-        const inactiveChallenges = await challengeEntry.getInactiveChallenges();
+        const inactiveChallenges = await getInactiveChallenges();
         console.log("Challenge inactivos: ", inactiveChallenges);
     } catch(error){
         res.status(500).json({message: "Error al obtener los challenges inactivos", error});
@@ -76,52 +83,22 @@ export const getInactiveChallenges = async(req: Request, res: Response)=>{
     }
 };
 
-export const updateChallenge = async(req: Request, res: Response)=>{
+export const updateChallengeController = async(req: Request, res: Response)=>{
     try{
-        const updateChallenge = await challengeEntry.updateChallenge(req.params.id, req.body);
+        const update = await updateChallenge(req.params.id, req.body);
 
-        if(!updateChallenge){
+        if(!update){
             res.status(404).json({message: "No se encontró el challenge"});
         }
-        res.status(200).json(updateChallenge);
+        res.status(200).json(update);
     } catch(error){
         res.status(500).json({message: "Error al actualizar el challenge", error});
     }
 };
 
-export const addParticipant = async(req: Request, res: Response)=>{
+export const deleteChallengeController = async(req: Request, res: Response)=>{
     try{
-        const {userId, challengeId} = req.params;
-
-        const updatedChallenge = await challengeEntry.addParticipant(userId, challengeId);
-
-        if(!updatedChallenge){
-            res.status(404).json({message: "No se encontró el challenge"});
-        }
-        res.status(200).json({message: "Participante añadido exitosamente", challenge: updatedChallenge});
-    } catch(error){
-        res.status(500).json({message: "Error al añadir el participante", error});
-    }
-};
-
-export const removeParticipant = async(req: Request, res: Response)=>{
-    try{
-        const {userId, challengeId} = req.params;
-        
-        const deletedChallenge = await challengeEntry.removeParticipant(userId, challengeId);
-
-        if(!deleteChallenge){
-            res.status(404).json({message: "No se encontró el challenge"});
-        }
-        res.status(200).json({message: "Participante eliminado exitosamente", challenge: deletedChallenge});
-    } catch(error){
-        res.status(500).json({message: "Error al eliminar el participante", error});
-    }
-};
-
-export const deleteChallenge = async(req: Request, res: Response)=>{
-    try{
-        await challengeEntry.deleteChallenge(req.params.id);
+        await deleteChallenge(req.params.id);
         res.status(200).json({message: "Challenge eliminado exitosamente"});
     } catch(error){
         res.status(500).json({message: "Error al eliminar el challenge", error});

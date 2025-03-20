@@ -1,7 +1,37 @@
 import mongoose, {ObjectId,Schema, model, Types} from "mongoose"
 
+export const challengeSchema = new Schema<IChallenge>({
+    title: { 
+        type: String, 
+        required: true
+    },
+    description: { 
+        type: String, 
+        required: true
+    }, 
+    goalType: { //Pot ser distància, temps, velocitat, etc
+        type: String, 
+        required: true
+    },
+    goalValue: { //Valor de la meta, pot ser 5km, 10min, 20km/h, etc
+        type: String, 
+        required: true
+    },
+    reward: { //Recompensa en punts
+        type: Number,
+        required: true
+    },
+    startDate: { //Data d'inici del repte
+        type: Date,
+        required: true
+    },
+    endDate: { //Data de finalització del repte
+        type: Date,
+        required: true
+    }
+});
+
 export interface IChallenge {
-    
     title: string;
     description: string; 
     goalType: string;
@@ -9,21 +39,7 @@ export interface IChallenge {
     reward: number;
     startDate: Date;
     endDate: Date;
-    participants: mongoose.Types.ObjectId[];
 }
 
-export const challengeSchema = new Schema<IChallenge>({
-
-    title: { type: String, required: true},
-    description: { type: String, required: true}, 
-    goalType: { type: String, required: true},
-    goalValue: {type: String, required:true},
-    reward: { type: Number,required:true},
-    startDate: { type: Date,required:true},
-    endDate: { type: Date,required:true},
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required:true}],
-});
-
-const challengeModel = model<IChallenge>('Challenge',challengeSchema);
-
-export default  challengeModel;
+const Challenge = mongoose.model('Challenge', challengeSchema);
+export default Challenge;

@@ -1,14 +1,13 @@
-import {Router} from 'express';
-import { createChallenge, getChallengeById, getAllChallenges, updateChallenge, deleteChallenge, getActiveChallenges, getInactiveChallenges, addParticipant, removeParticipant } from '../controllers/challengeController';
-
-const router = Router();
+import express from 'express';
+import * as challengeController from '../controllers/challengeController';
+const router = express.Router();
 
 /**
  * @swagger
- * /api/challenge:
+ * /api/challenges:
  *   post:
  *     summary: Crea un nuevo challenge
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     requestBody:
  *       required: true
  *       content:
@@ -32,10 +31,6 @@ const router = Router();
  *               endDate:
  *                 type: string
  *                 format: date
- *               participants:
- *                 type: array
- *                 items:
- *                   type: string
  *     responses:
  *       201:
  *         description: Challenge creado con éxito
@@ -70,11 +65,6 @@ const router = Router();
  *                   type: string
  *                   format: date
  *                   description: Fecha de finalización
- *                 participants:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: Array de nombres de los participantes
  *       400:
  *         description: Datos inválidos en la petición
  *         content:
@@ -94,14 +84,14 @@ const router = Router();
  *                 message:
  *                   type: string
  */
-router.post('/', createChallenge);
+router.post('/', challengeController.createChallengeController);
 
 /**
  * @swagger
  * /api/challenges/{id}:
  *   get:
  *     summary: Obtener un challenge por su ID
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     parameters:
  *       - in: path
  *         name: id
@@ -143,11 +133,6 @@ router.post('/', createChallenge);
  *                   type: string
  *                   format: date
  *                   description: Fecha de finalización
- *                 participants:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: Array de IDs de los participantes
  *       404:
  *         description: Challenge no encontrado
  *         content:
@@ -167,14 +152,14 @@ router.post('/', createChallenge);
  *                 message:
  *                   type: string
  */
-router.get('/:id', getChallengeById);
+router.get('/:id', challengeController.getChallengeByIdController);
 
 /**
  * @swagger
  * /api/challenges/:
  *   get:
  *     summary: Obtener un challenge por su ID
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     parameters:
  *       - in: path
  *         name: id
@@ -216,11 +201,6 @@ router.get('/:id', getChallengeById);
  *                   type: string
  *                   format: date
  *                   description: Fecha de finalización
- *                 participants:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: Array de IDs de los participantes
  *       500:
  *         description: Error interno del servidor
  *         content:
@@ -231,14 +211,14 @@ router.get('/:id', getChallengeById);
  *                 message:
  *                   type: Error interno del servidor
  */
-router.get('/', getAllChallenges);
+router.get('/', challengeController.getAllChallengesController);
 
 /**
  * @swagger
  * /api/challenges/active:
  *   get:
  *     summary: Obtener todos los challenges activos
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     responses:
  *       200:
  *         description: Lista de challenges activos obtenida exitosamente
@@ -282,11 +262,6 @@ router.get('/', getAllChallenges);
  *                         type: string
  *                         format: date
  *                         description: Fecha de finalización
- *                       participants:
- *                         type: array
- *                         items:
- *                           type: string
- *                         description: Array de IDs de los participantes
  *       404:
  *         description: No se encontraron challenges activos
  *         content:
@@ -308,14 +283,14 @@ router.get('/', getAllChallenges);
  *                   type: string
  *                   example: "Error al obtener los challenges activos"
  */
-router.get('/active', getActiveChallenges);
+router.get('/active', challengeController.getActiveChallengesController);
 
 /**
  * @swagger
  * /api/challenges/inactive:
  *   get:
  *     summary: Obtener todos los challenges inactivos
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     responses:
  *       200:
  *         description: Lista de challenges inactivos obtenida exitosamente
@@ -359,11 +334,6 @@ router.get('/active', getActiveChallenges);
  *                         type: string
  *                         format: date
  *                         description: Fecha de finalización
- *                       participants:
- *                         type: array
- *                         items:
- *                           type: string
- *                         description: Array de IDs de los participantes
  *       404:
  *         description: No se encontraron challenges inactivos
  *         content:
@@ -385,14 +355,14 @@ router.get('/active', getActiveChallenges);
  *                   type: string
  *                   example: "Error al obtener los challenges inactivos"
  */
-router.get('/inactive', getInactiveChallenges);
+router.get('/inactive', challengeController.getInactiveChallengesController);
 
 /**
  * @swagger
  * /api/challenges/{id}:
  *   put:
  *     summary: Actualizar un challenge existente
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     parameters:
  *       - in: path
  *         name: id
@@ -430,11 +400,6 @@ router.get('/inactive', getInactiveChallenges);
  *                 type: string
  *                 format: date
  *                 description: Nueva fecha de finalización
- *               participants:
- *                 type: array
- *                 items:
- *                   type: string
- *                 description: Nuevo array de IDs de participantes
  *     responses:
  *       200:
  *         description: Challenge actualizado exitosamente
@@ -469,11 +434,6 @@ router.get('/inactive', getInactiveChallenges);
  *                   type: string
  *                   format: date
  *                   description: Fecha de finalización actualizada
- *                 participants:
- *                   type: array
- *                   items:
- *                     type: string
- *                   description: Array actualizado de participantes
  *       404:
  *         description: Challenge no encontrado
  *         content:
@@ -493,157 +453,15 @@ router.get('/inactive', getInactiveChallenges);
  *                 message:
  *                   type: string
  */
-router.put('/:id', updateChallenge);
+router.put('/:id', challengeController.updateChallengeController);
 
-/**
- * @swagger
- * /api/challenges/addParticipant/{userId}/{challengeId}:
- *   put:
- *     summary: Añadir un participante a un challenge
- *     tags: [Challenge]
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID del usuario a añadir al challenge
- *       - in: path
- *         name: challengeId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID del challenge al que añadir el participante
- *     responses:
- *       200:
- *         description: Participante añadido exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje de éxito
- *                   example: "Participante añadido exitosamente"
- *                 challenge:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       description: ID del challenge
- *                     title:
- *                       type: string
- *                       description: Título del challenge
- *                     participants:
- *                       type: array
- *                       items:
- *                         type: string
- *                       description: Array actualizado de participantes
- *       400:
- *         description: Datos inválidos en la petición
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Se requiere userId y challengeId"
- *       404:
- *         description: Challenge o usuario no encontrado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "No se encontró el challenge"
- *       500:
- *         description: Error interno del servidor
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Error al añadir al participante"
- */
-router.put('/addParticipant/:userId/:challengeId', addParticipant);
-
-/**
- * @swagger
- * /api/challenges/removeParticipant/{userId}/{challengeId}:
- *   put:
- *     summary: Eliminar un participante de un challenge
- *     tags: [Challenge]
- *     parameters:
- *       - in: path
- *         name: userId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID del usuario a eliminar del challenge
- *       - in: path
- *         name: challengeId
- *         schema:
- *           type: string
- *         required: true
- *         description: ID del challenge del cual eliminar el participante
- *     responses:
- *       200:
- *         description: Participante eliminado exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   description: Mensaje de éxito
- *                   example: "Participante eliminado exitosamente"
- *                 challenge:
- *                   type: object
- *                   properties:
- *                     _id:
- *                       type: string
- *                       description: ID del challenge
- *                     participants:
- *                       type: array
- *                       items:
- *                         type: string
- *                       description: Array actualizado de participantes
- *       404:
- *         description: Challenge o usuario no encontrado
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "No se encontró el challenge o el usuario"
- *       500:
- *         description: Error interno del servidor
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Error al eliminar el participante"
- */
-router.put('/removeParticipant/:userId/:challengeId', removeParticipant);
 
 /**
  * @swagger
  * /api/challenges/{id}:
  *   delete:
  *     summary: Eliminar un challenge
- *     tags: [Challenge]
+ *     tags: [Challenges]
  *     parameters:
  *       - in: path
  *         name: id
@@ -684,6 +502,6 @@ router.put('/removeParticipant/:userId/:challengeId', removeParticipant);
  *                   type: string
  *                   example: "Error al eliminar el challenge"
  */
-router.delete('/delete/:challengeId', deleteChallenge);
+router.delete('/delete/:challengeId', challengeController.deleteChallengeController);
 
 export default router;

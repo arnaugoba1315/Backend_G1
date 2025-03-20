@@ -1,5 +1,5 @@
 import {Router} from 'express';
-import { createAchievement, deleteAchievement, getAchievementbyId, getAllAchievement, updateAchievement } from '../controllers/achievementController';
+import * as achievementController from '../controllers/achievementController';
 const router = Router();
 
 /**
@@ -97,7 +97,7 @@ const router = Router();
  *                 error:
  *                   type: string
  */
-router.post('/', createAchievement);
+router.post('/', achievementController.createAchievementController);
 
 /**
  * @swagger
@@ -167,7 +167,7 @@ router.post('/', createAchievement);
  *                 error:
  *                   type: string
  */
-router.get('/:id', getAchievementbyId);
+router.get('/:id', achievementController.getAchievementbyIdController);
 
 /**
  * @swagger
@@ -242,7 +242,7 @@ router.get('/:id', getAchievementbyId);
  *                 error:
  *                   type: string
  */
-router.get('/', getAllAchievement);
+router.get('/', achievementController.getAllAchievementController);
 
 /**
  * @swagger
@@ -340,7 +340,7 @@ router.get('/', getAllAchievement);
  *                 error:
  *                   type: string
  */
-router.put('/:id', updateAchievement);
+router.put('/:id', achievementController.updateAchievementController);
 
 /**
  * @swagger
@@ -390,6 +390,6 @@ router.put('/:id', updateAchievement);
  *                 error:
  *                   type: string
  */
-router.delete('/delete/:challengeId', deleteAchievement);
+router.delete('/delete/:challengeId', achievementController.deleteAchievementController);
 
 export default router;
