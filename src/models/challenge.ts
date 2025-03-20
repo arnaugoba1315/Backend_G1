@@ -1,4 +1,4 @@
-import mongoose, {ObjectId,Schema, model, Types} from "mongoose"
+import mongoose, {ObjectId,Schema, model, Types}from "mongoose"
 
 export interface IChallenge {
     
@@ -9,7 +9,7 @@ export interface IChallenge {
     reward: number;
     startDate: Date;
     endDate: Date;
-    participants: mongoose.Types.ObjectId[];
+    participants: mongoose.Types.ObjectId;
 }
 
 export const challengeSchema = new Schema<IChallenge>({
@@ -21,9 +21,9 @@ export const challengeSchema = new Schema<IChallenge>({
     reward: { type: Number,required:true},
     startDate: { type: Date,required:true},
     endDate: { type: Date,required:true},
-    participants: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User', required:true}],
+    participants: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required:true},
 });
 
-const challengeModel = model<IChallenge>('Challenge',challengeSchema);
+const challengeModel = model<IChallenge>('Achievement',challengeSchema);
 
-export default  challengeModel;
+export default  challengeModel
