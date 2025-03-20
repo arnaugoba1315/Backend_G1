@@ -2,6 +2,8 @@ import express from 'express';
 import setupSwagger from './config/swaggerConfig';
 import dotenv from 'dotenv';
 import userRoutes from './routes/userRoutes';
+import referencePointRoutes from './routes/referencePointRoutes';
+import activityRoutes from './routes/activityRoutes';
 import connectDatabase from './config/db';
 import achievementRoutes from './routes/achievementRoutes';
 import challengeRoutes from './routes/challengeRoutes';
@@ -21,6 +23,8 @@ app.use(express.json());
 
 // Rutas
 app.use('/api/users', userRoutes);
+app.use('/api/referencePoints', referencePointRoutes);
+app.use('/api/activities', activityRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('api/challenges', challengeRoutes);
 app.get('/', (req, res) => {
