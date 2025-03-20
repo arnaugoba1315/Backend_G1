@@ -5,7 +5,8 @@ import userRoutes from './routes/userRoutes';
 import referencePointRoutes from './routes/referencePointRoutes';
 import activityRoutes from './routes/activityRoutes';
 import connectDatabase from './config/db';
-
+import achievementRoutes from './routes/achievementRoutes';
+import challengeRoutes from './routes/challengeRoutes';
 
 // Cargar variables de entorno
 dotenv.config();
@@ -24,6 +25,8 @@ app.use(express.json());
 app.use('/api/users', userRoutes);
 app.use('/api/referencePoints', referencePointRoutes);
 app.use('/api/activities', activityRoutes);
+app.use('/api/achievements', achievementRoutes);
+app.use('api/challenges', challengeRoutes);
 app.get('/', (req, res) => {
   res.send('API de Ejercicios tipo Strava funcionando. Visita /api-docs para la documentación');
 });
