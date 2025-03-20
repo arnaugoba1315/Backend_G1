@@ -1,24 +1,5 @@
 import mongoose, { Schema, Types, Document } from "mongoose";
 
-// Interface for the User document
-export interface IUser extends Document {
-    _id: Types.ObjectId;
-    username: string;
-    email: string;
-    password: string;
-    profilePicture?: string;
-    bio?: string;
-    level: number;
-    totalDistance: number;
-    totalTime: number;
-    activities: Types.ObjectId[];
-    achievements: Types.ObjectId[];
-    challengesCompleted: Types.ObjectId[];
-    createdAt: Date;
-    updatedAt: Date;
-    visibility: boolean;
-}
-
 // Schema definition
 const userSchema = new Schema({
     username: {
@@ -84,6 +65,25 @@ const userSchema = new Schema({
 }, {
     timestamps: true // This automatically handles createdAt and updatedAt
 });
+
+// Interface for the User document
+export interface IUser extends Document {
+    _id: Types.ObjectId;
+    username: string;
+    email: string;
+    password: string;
+    profilePicture?: string;
+    bio?: string;
+    level: number;
+    totalDistance: number;
+    totalTime: number;
+    activities: Types.ObjectId[];
+    achievements: Types.ObjectId[];
+    challengesCompleted: Types.ObjectId[];
+    createdAt: Date;
+    updatedAt: Date;
+    visibility: boolean;
+}
 
 // No mostrar usuarios invisibles por defecto
 userSchema.pre('find', function() {

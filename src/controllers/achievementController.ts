@@ -1,5 +1,5 @@
 import { Request,Response } from "express";
-import { achievementEntry } from "../services/achievementService";
+import * as achievementService from '../services/achievementService';
 import { IAchievement } from "../models/achievement";
 
 export const createAchievementController = async(req: Request, res: Response)=>{
@@ -20,7 +20,7 @@ export const createAchievementController = async(req: Request, res: Response)=>{
             res.status(400).json({ message: "Todos los campos son requeridos"});
         }
 
-        const createdAchievement = await achievementEntry.createAchievement(req.body);
+        const createdAchievement = await achievementService.createAchievement(req.body);
         console.log("Logro creado:", createdAchievement);
 
         res.status(201).json({message: "Logro creado exitosamente"});
@@ -32,7 +32,7 @@ export const createAchievementController = async(req: Request, res: Response)=>{
 
 export const getAchievementbyIdController = async(req: Request, res: Response)=>{
     try{
-        const achievementId = await achievementEntry.getAchievementbyId(req.params.id);
+        const achievementId = await achievementService.getAchievementbyId(req.params.id);
 
        if(!achievementId){
             res.status(404).json({message: "No se encontró el logro"});
@@ -46,7 +46,7 @@ export const getAchievementbyIdController = async(req: Request, res: Response)=>
 
 export const getAllAchievementController = async(req: Request, res: Response)=>{
     try{
-        const achievement = await achievementEntry.getAllAchievement();
+        const achievement = await achievementService.getAllAchievement();
 
         if(achievement.length === 0){
             res.status(404).json({message: "No se encontraron logros"});
@@ -64,7 +64,7 @@ export const getAllAchievementController = async(req: Request, res: Response)=>{
 
 export const updateAchievementController = async(req: Request, res: Response)=>{
     try{
-        const updatedAchievement = await achievementEntry.updateAchievement(req.params.id, req.body);
+        const updatedAchievement = await achievementService.updateAchievement(req.params.id, req.body);
 
         if(!updatedAchievement){
             res.status(404).json({message: "No se encontró el logro"});
@@ -77,7 +77,7 @@ export const updateAchievementController = async(req: Request, res: Response)=>{
 
 export const deleteAchievementController = async(req: Request, res: Response)=>{
     try{
-        await achievementEntry.deleteAchievement(req.params.id);
+        await achievementService.deleteAchievement(req.params.id);
         res.status(200).json({message: "Logro eliminado exitosamente"});
     } catch(error){
         res.status(500).json({message: "Error al eliminar el logro", error});

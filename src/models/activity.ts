@@ -46,7 +46,7 @@ export const activitySchema = new Schema<IActivity>({
     musicPlaylist: [{
         type: Schema.Types.ObjectId,
         ref: 'Song',
-        default: '',
+        default: [],
         required: true
     }],
     type: {
@@ -71,5 +71,5 @@ export interface IActivity {
     type:"running"|"cycling"|"hiking"|"walking";
 }
 
-const activityModel = mongoose.model('Activity',activitySchema);
-export default  activityModel;
+const Activity = mongoose.model('Activity',activitySchema);
+export default  Activity;
