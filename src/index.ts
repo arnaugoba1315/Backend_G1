@@ -1,5 +1,4 @@
 import express from 'express';
-import connectDB from './config/db';
 import userRoutes from './routes/userRoutes';
 import referencePointRoutes from './routes/referencePointRoutes';
 import activityRoutes from './routes/activityRoutes';
