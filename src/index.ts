@@ -7,6 +7,7 @@ import activityRoutes from './routes/activityRoutes';
 import connectDatabase from './config/db';
 import achievementRoutes from './routes/achievementRoutes';
 import challengeRoutes from './routes/challengeRoutes';
+import songRoutes from './routes/songRoutes';
 import { corsHandler } from './middleware/corsHandler';
 
 //Carregar variables d'entorn
@@ -27,7 +28,8 @@ app.use('/api/users', userRoutes);
 app.use('/api/referencePoints', referencePointRoutes);
 app.use('/api/activities', activityRoutes);
 app.use('/api/achievements', achievementRoutes);
-app.use('api/challenges', challengeRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/songs', songRoutes);
 app.get('/', (req, res) => {
   res.send('API en funcionament, la documentació es troba a /api-docs.');
 });

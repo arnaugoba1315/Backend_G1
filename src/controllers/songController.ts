@@ -1,92 +1,112 @@
-import {
-    createSong, 
-    getAllSongs, 
-    getSongById, 
-    getSongByName, 
-    getSongsByArtist, 
-    getSongsByGenre,
-    getSymilarBpm, 
-    updateSong, 
-    deleteSong
-} from '../services/songService.js';
+import * as songService from '../services/songService';
 
 import { Request, Response } from 'express';
 
-export const createSongController = async (req: Request, res: Response) => {
+export const createSongHandler = async (req: Request, res: Response): Promise <any> => {
     try{
-        const song = await createSong(req.body);
+        const song = await songService.createSong(req.body);
         if(!song){
             return res.status(400).json({message: 'Error creating song'});
         }
-        res.status(200).json(song);
+        res.status(201).json(song);
     }catch(err:any){
         res.status(500).json({message:"Server error: ", err});
     }
 };
 
-export const getAllSongsController = async (req: Request, res: Response) => {
+export const getAllSongsHandler = async (req: Request, res: Response) => {
     try{
-        const songs = await getAllSongs();
+        const songs = await songService.getAllSongs();
         if(!songs){
             res.status(401).json({message: 'No songs found'});
         }
-        res.status(200).json(songs);
+        res.status(201).json(songs);
     }catch(err:any){
         res.status(500).json({message:"Server error: " ,err});
 
     }
 };
 
-export const getSongByIdController = async (req: Request, res: Response) => {
+export const getSongByIdHandler = async (req: Request, res: Response) => {
     try{
-        const song = await getSongById(req.params.id);
+        const song = await songService.getSongById(req.params.id);
         if(!song){
             res.status(401).json({message: `Song with Id ${req.params.id} not found`});
         }
-        res.status(200).json(song);
+        res.status(201).json(song);
     }catch(err:any){
         res.status(500).json({message:"Server error: ", err});
     }
 };
 
-export const getSongByNameController = async (req: Request, res: Response) => {
+export const getSongByNameHandler = async (req: Request, res: Response) => {
     try{
-        const song = await getSongByName(req.params.name);
+        const song = await songService.getSongByName(req.params.name);
         if(!song){
             res.status(401).json({message: `Song "${req.params.name}" not found`});
         }
-        res.status(200).json(song);
+        res.status(201).json(song);
     }catch(err:any){
         res.status(500).json({message:"Server error: ", err});
     }
 };
 
-export const getSongsByArtistController = async (req: Request, res: Response) => {
+export const getSongsByArtistHandler = async (req: Request, res: Response) => {
     try{
-        const song = await getSongsByArtist(req.params.artist);
-        if(!song){
+        const songs = await songService.getSongsByArtist(req.params.artist);
+        if(!songs){
             res.status(401).json({message: `Artist "${req.params.artist}" not found`});
         }
-        res.status(200).json(song);
+        res.status(201).json(songs);
     }catch(err:any){
         res.status(500).json({message:"Server error: ", err});
     }
 };
 
-export const getSongsByGenreController = async (req: Request, res: Response) => {
+export const getSongsByGenreHandler = async (req: Request, res: Response) => {
     try{
-        const song = await getSongsByGenre(req.params.genre);
-        if(!song){
+        const songs = await songService.getSongsByGenre(req.params.genre);
+        if(!songs){
             res.status(401).json({message: `Genre "${req.params.genre}" not found`});
         }
-        res.status(200).json(song);
+        res.status(201).json(songs);
     }catch(err:any){
         res.status(500).json({message:"Server error: ", err});
     }
 };
 
-export const getSymilarBpmController = async (req: Request, res: Response) => {};
+export const getSymilarBpmHandler = async (req: Request, res: Response) => {
+    try{
+        const songs = await songService.getSymilarBpm(Number(req.params.bpm));
+        if(!songs){
+            res.status(401).json({message: `Songs with bpm symilar to "${req.params.bpm}" not found`});
+        }
+        res.status(201).json(songs);
+    }catch(err:any){
+        res.status(500).json({message:"Server error: ", err});
+    }
+};
 
-export const updateSongController = async (req: Request, res: Response) => {};
+export const updateSongHandler = async (req: Request, res: Response) => {
+    try{
+        const song = await songService.updateSong(req.params.id,req.body);
+        if(!song){
+            res.status(401).json({message: `Song "${req.body.title}" not found`});
+        }
+        res.status(201).json(song);
+    }catch(err:any){
+        res.status(500).json({message:"Server error: ", err});
+    }
+};
 
-export const deleteSongController = async (req: Request, res: Response) => {};
+export const deleteSongHandler = async (req: Request, res: Response) => {
+    try{
+        const song = await songService.deleteSong(req.params.id);
+        if(!song){
+            res.status(401).json({message: `Song "${req.params.title}" not found`});
+        }
+        res.status(201).json(song);
+    }catch(err:any){
+        res.status(500).json({message:"Server error: ", err});
+    }
+};

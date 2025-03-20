@@ -1,7 +1,6 @@
-import Song, {ISong} from '../models/song.js';
+import Song, {ISong} from '../models/song';
 import {Schema} from 'mongoose';
 
-//createSong , getAllSongs, getSongById, updateSong, deleteSong
 
 export const createSong = async (song:ISong) => {
     const newSong = new Song(song);
@@ -34,7 +33,7 @@ export const getSymilarBpm = async (bpm:number) => {
 };
 
 export const updateSong = async (id:string, song:ISong) => {
-    return await Song.findByIdAndUpdate;
+    return await Song.findByIdAndUpdate(id,song,{new:true});
 };
 
 export const deleteSong = async (id:string) => {
