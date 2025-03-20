@@ -16,7 +16,7 @@ const referencePointSchema = new mongoose.Schema({
         type: Number,
         require: true
     },
-    timestamp :{
+    timestamp :{ //temps de gravació del punt de referència
         type: Date,
         require: true
     },
