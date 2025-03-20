@@ -3,6 +3,49 @@ import * as songController from '../controllers/songController';
 
 const router = express.Router();
 
+
+/**
+ * @openapi
+ * components:
+ *   schemas:
+ *     Song:
+ *       type: object
+ *       required:
+ *         - title
+ *         - artist
+ *         - album
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: El títol de la cançó
+ *         artist:
+ *           type: string
+ *           description: L'artista de la cançó
+ *         album:
+ *           type: string
+ *           description: L'àlbum a la qual la cançó pertany
+ *         genre:
+ *           type: string
+ *           description: El gènere de la cançó
+ *         duration:
+ *           type: number
+ *           description: La duració de la cançó en segons
+ *         spotifyLink:
+ *           type: string
+ *           description: L'enllaç de Spotify de la cançó
+ *         bpm:
+ *           type: number
+ *           description: Les pulsacions per minut que es té generalment amb aquesta cançó
+ *       example:
+ *         title: "Shape of You"
+ *         artist: "Ed Sheeran"
+ *         album: "÷ (Divide)"
+ *         genre: "Pop"
+ *         duration: 233
+ *         spotifyLink: "https://open.spotify.com/track/7qiZfU4dY1lWllzX7mPBI3"
+ *         bpm: 96
+ */
+
 /**
  * @openapi
  * /api/songs:

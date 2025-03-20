@@ -5,6 +5,43 @@ const router = Router();
 
 /**
  * @openapi
+ * components:
+ *   schemas:
+ *     Achievement:
+ *       type: object
+ *       required:
+ *         - title
+ *         - description
+ *         - condition
+ *         - icon
+ *         - usersUnlocked
+ *       properties:
+ *         title:
+ *           type: string
+ *           description: The title of the achievement
+ *         description:
+ *           type: string
+ *           description: A detailed description of the achievement
+ *         condition:
+ *           type: string
+ *           description: The condition required to unlock the achievement
+ *         icon:
+ *           type: string
+ *           description: A URL or path to the icon representing the achievement
+ *         usersUnlocked:
+ *           type: string
+ *           format: objectId
+ *           description: The ID of the user who unlocked this achievement (reference to User model)
+ *       example:
+ *         title: "Marathon Finisher"
+ *         description: "Complete a full marathon (42.195 km)"
+ *         condition: "Run a total distance of 42.195 km in a single activity"
+ *         icon: "https://example.com/icons/marathon.png"
+ *         usersUnlocked: "60d5ecb74d2dbb001f645a7c"
+ */
+
+/**
+ * @openapi
  * /api/achievements:
  *   post:
  *     summary: Crear un nuevo logro

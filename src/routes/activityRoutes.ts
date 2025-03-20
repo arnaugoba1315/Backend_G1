@@ -5,6 +5,86 @@ const router = express.Router();
 
 /**
  * @openapi
+ * components:
+ *   schemas:
+ *     Activity:
+ *       type: object
+ *       required:
+ *         - author
+ *         - name
+ *         - startTime
+ *         - endTime
+ *         - duration
+ *         - distance
+ *         - elevationGain
+ *         - averageSpeed
+ *         - route
+ *         - musicPlaylist
+ *         - type
+ *       properties:
+ *         author:
+ *           type: string
+ *           format: objectId
+ *           description: The ID of the user who authored the activity (reference to User model)
+ *         name:
+ *           type: string
+ *           description: The name of the activity
+ *         startTime:
+ *           type: string
+ *           format: date-time
+ *           description: The start time of the activity
+ *         endTime:
+ *           type: string
+ *           format: date-time
+ *           description: The end time of the activity
+ *         duration:
+ *           type: number
+ *           description: The duration of the activity in minutes
+ *         distance:
+ *           type: number
+ *           description: The distance covered during the activity
+ *         elevationGain:
+ *           type: number
+ *           description: The total elevation gain during the activity
+ *         averageSpeed:
+ *           type: number
+ *           description: The average speed during the activity
+ *         caloriesBurned:
+ *           type: number
+ *           description: The estimated calories burned during the activity (optional)
+ *         route:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: objectId
+ *           description: Array of reference point IDs representing the activity route
+ *         musicPlaylist:
+ *           type: array
+ *           items:
+ *             type: string
+ *             format: objectId
+ *           description: Array of song IDs representing the music playlist for the activity
+ *         type:
+ *           type: string
+ *           enum: [running, cycling, hiking, walking]
+ *           description: The type of activity
+ *       example:
+ *         author: "60d5ecb74d2dbb001f645a7c"
+ *         name: "Morning Run"
+ *         startTime: "2025-03-21T08:00:00Z"
+ *         endTime: "2025-03-21T09:00:00Z"
+ *         duration: 60
+ *         distance: 10000
+ *         elevationGain: 100
+ *         averageSpeed: 10
+ *         caloriesBurned: 500
+ *         route: ["60d5ecb74d2dbb001f645a7d", "60d5ecb74d2dbb001f645a7e"]
+ *         musicPlaylist: ["60d5ecb74d2dbb001f645a7f", "60d5ecb74d2dbb001f645a80"]
+ *         type: "running"
+ */
+
+/**
+ * @openapi
  * /api/activities:
  *   post:
  *     summary: Create a new activity associated with a user

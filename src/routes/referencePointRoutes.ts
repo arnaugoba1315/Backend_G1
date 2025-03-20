@@ -5,6 +5,37 @@ const router = express.Router();
 
 /**
  * @openapi
+ * components:
+ *   schemas:
+ *     ReferencePoint:
+ *       type: object
+ *       required:
+ *         - latitude
+ *         - longitude
+ *         - altitude
+ *       properties:
+ *         name:
+ *           type: string
+ *           description: El nom del punt de referència
+ *           default: ''
+ *         latitude:
+ *           type: number
+ *           description: La coordenada de latitud del punt de referència
+ *         longitude:
+ *           type: number
+ *           description: La coordenada de longitud del punt de referència
+ *         altitude:
+ *           type: number
+ *           description: L'altura respecte l'altura del mar del punt de referència
+ *       example:
+ *         name: "Eiffel Tower"
+ *         latitude: 48.8584
+ *         longitude: 2.2945
+ *         altitude: 324
+ */
+
+/**
+ * @openapi
  * /api/referencepoints:
  *   post:
  *     summary: Create a new reference point
