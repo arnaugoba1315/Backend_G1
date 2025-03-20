@@ -5,51 +5,62 @@ import userRoutes from './routes/userRoutes';
 import connectDatabase from './config/db';
 import achievementRoutes from './routes/achievementRoutes';
 import challengeRoutes from './routes/challengeRoutes';
+import { corsHandler } from './middleware/corsHandler';
 
-// Cargar variables de entorno
+//Carregar variables d'entorn
 dotenv.config();
 
-// Inicializar Express
+//Iniciar Express
 const app = express();
 const PORT = process.env.PORT || 3000;
 
 setupSwagger(app);
 
-// Middleware
-//app.use(cors());
+//Middleware
 app.use(express.json());
+app.use(corsHandler);
 
-// Rutas
+//Rutes
 app.use('/api/users', userRoutes);
 app.use('/api/achievements', achievementRoutes);
 app.use('api/challenges', challengeRoutes);
 app.get('/', (req, res) => {
-  res.send('API de Ejercicios tipo Strava funcionando. Visita /api-docs para la documentación');
+  res.send('API en funcionament, la documentació es troba a /api-docs.');
 });
 
 
-// Manejador de rutas no encontradas
+//Manejador de rutes no trobades
 app.use((req, res) => {
   res.status(404).json({
     status: 'error',
-    message: 'Ruta no encontrada'
+    message: 'Ruta no trobada'
   });
 });
 
-// Manejador de errores global
+//Manejador d'errors globals
 app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
   console.error(err.stack);
   res.status(err.statusCode || 500).json({
     status: 'error',
-    message: err.message || 'Error interno del servidor'
+    message: err.message || 'Error intern del servidor'
   });
 });
+
+async function startServer() {
+  try {
+    await connectDatabase();
+      
+    //Indicar per consola que s'ha iniciat el servidor correctament
+    app.listen(PORT, () => {
+      console.log(`Servidor executant-se en http://localhost:${PORT}`); //Important el tipus de cometes utilitzades aquí per poder pasar la variable PORT
+      console.log(`Documentació disponible en http://localhost:${PORT}/api-docs`);
+      });
+    } catch (error) {
+      console.error('Error al iniciar el servidor:', error);
+      process.exit(1);
+    }
+}
   
-connectDatabase();
-// Iniciar el servidor solo después de conectar a la base de datos
-  app.listen(PORT, () => {
-    console.log(`Servidor ejecutándose en http://localhost:${PORT}`);
-    console.log(`Documentación disponible en http://localhost:${PORT}/api-docs`);
-  });
+startServer();
 
 export default app;
