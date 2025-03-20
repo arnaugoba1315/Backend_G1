@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
+import * as userService from '../services/userService';
 
 /**
  * Crear un nuevo usuario
@@ -110,18 +111,30 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
 };
 
 /**
- * Obtener todos los usuarios
+ * Obtener usuarios con paginación
  */
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    const users = await User.find({}, '-password');
+    // Obtener página y límite de los parámetros de consulta, con valores predeterminados
+    const page = parseInt(req.query.page?.toString() || '1', 10);
+    const limit = parseInt(req.query.limit?.toString() || '10', 10);
     
-    res.status(200).json(users);
+    // Validar parámetros de paginación
+    if (page < 1 || limit < 1 || limit > 100) {
+      res.status(400).json({ message: 'Parámetros de paginación inválidos' });
+      return;
+    }
+    
+    // Obtener usuarios paginados
+    const result = await userService.getPaginatedUsers(page, limit);
+    
+    res.status(200).json(result);
   } catch (error) {
-    console.error('Error fetching users:', error);
-    res.status(500).json({ message: 'Error fetching users' });
+    console.error('Error al obtener usuarios:', error);
+    res.status(500).json({ message: 'Error al obtener usuarios' });
   }
 };
+
 
 /**
  * Obtener un usuario por ID

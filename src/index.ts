@@ -1,6 +1,5 @@
 import express from 'express';
-import setupSwagger from './config/swaggerConfig';
-import dotenv from 'dotenv';
+import connectDB from './config/db';
 import userRoutes from './routes/userRoutes';
 import referencePointRoutes from './routes/referencePointRoutes';
 import activityRoutes from './routes/activityRoutes';
@@ -66,5 +65,3 @@ async function startServer() {
 }
   
 startServer();
-
-export default app;
