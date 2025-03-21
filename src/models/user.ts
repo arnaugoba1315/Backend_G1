@@ -85,19 +85,28 @@ export interface IUser extends Document {
     visibility: boolean;
 }
 
-// No mostrar usuarios invisibles por defecto
+// Modificat: no aplicar el pre-hook quan es demana incloure usuaris invisibles
 userSchema.pre('find', function() {
-    this.where({ visible: { $ne: false } });
-  });
-  
-  userSchema.pre('findOne', function() {
-    this.where({ visible: { $ne: false } });
-  });
-  
-  // Asegurarse de que el campo updatedAt se actualiza
-  userSchema.pre('findOneAndUpdate', function() {
+    // Verificar si la consulta té l'opció includeInvisible
+    const includeInvisible = (this as any)._mongooseOptions?.includeInvisible;
+    
+    if (!includeInvisible) {
+        // Només filtrar si no es demana incloure usuaris invisibles
+        this.where({ visibility: { $ne: false } });
+    }
+});
+
+userSchema.pre('findOne', function() {
+    const includeInvisible = (this as any)._mongooseOptions?.includeInvisible;
+    
+    if (!includeInvisible) {
+        this.where({ visibility: { $ne: false } });
+    }
+});
+
+userSchema.pre('findOneAndUpdate', function() {
     this.set({ updatedAt: new Date() });
-  });
+});
 
 const UserModel = mongoose.model<IUser>('User', userSchema);
 export default UserModel;

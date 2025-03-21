@@ -260,4 +260,29 @@ router.put('/:id', userController.updateUser);
  */
 router.delete('/:id', userController.deleteUser);
 
+/**
+ * @openapi
+ * /api/users/{id}/toggle-visibility:
+ *   put:
+ *     summary: Toggle user visibility
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: User ID
+ *     responses:
+ *       200:
+ *         description: User visibility toggled successfully
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error toggling user visibility
+ */
+router.put('/:id/toggle-visibility', userController.toggleUserVisibility);
+
+
+
 export default router;

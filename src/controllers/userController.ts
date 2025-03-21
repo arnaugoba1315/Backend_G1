@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import User from '../models/user';
 import bcrypt from 'bcrypt';
 import * as userService from '../services/userService';
+import mongoose from 'mongoose';
 
 /**
  * Crear un nuevo usuario
@@ -87,9 +88,7 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
     if (!isMatch) {
       res.status(401).json({ message: 'Invalid credentials' });
       return;
-     
     }
-    
     
     // Respuesta sin incluir la contraseña
     const userResponse = {
@@ -115,9 +114,14 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
  */
 export const getAllUsers = async (req: Request, res: Response): Promise<void> => {
   try {
-    // Obtener página y límite de los parámetros de consulta, con valores predeterminados
+    // Obtener página y límite de los parámetros de consulta
     const page = parseInt(req.query.page?.toString() || '1', 10);
     const limit = parseInt(req.query.limit?.toString() || '10', 10);
+    
+    // Procesar el parámetro includeInvisible
+    const includeInvisible = req.query.includeInvisible === 'true';
+    
+    console.log(`Solicitud de usuarios: página ${page}, límite ${limit}, incluir invisibles: ${includeInvisible}`);
     
     // Validar parámetros de paginación
     if (page < 1 || limit < 1 || limit > 100) {
@@ -126,7 +130,7 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     }
     
     // Obtener usuarios paginados
-    const result = await userService.getPaginatedUsers(page, limit);
+    const result = await userService.getPaginatedUsers(page, limit, includeInvisible);
     
     res.status(200).json(result);
   } catch (error) {
@@ -134,7 +138,6 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     res.status(500).json({ message: 'Error al obtener usuarios' });
   }
 };
-
 
 /**
  * Obtener un usuario por ID
@@ -202,10 +205,10 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   try {
     const userId = req.params.id;
     
-    // En lugar de eliminar, actualizar el campo visible a false
+    // En lugar de eliminar, actualizar el campo visibility a false
     const updatedUser = await User.findByIdAndUpdate(
       userId,
-      { visible: false, updatedAt: new Date() },
+      { visibility: false, updatedAt: new Date() },
       { new: true }
     );
     
@@ -219,11 +222,69 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
       user: {
         id: updatedUser._id,
         username: updatedUser.username,
-        visible: updatedUser.visibility
+        visibility: updatedUser.visibility
       }
     });
   } catch (error) {
     console.error('Error al ocultar usuario:', error);
     res.status(500).json({ message: 'Error al ocultar usuario' });
+  }
+};
+
+/**
+ * Alternar visibilidad de un usuario
+ */
+export const toggleUserVisibility = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const userId = req.params.id;
+
+    // Utilitzem directament el mètode de connexió de MongoDB per evitar els hooks de Mongoose
+    const db = mongoose.connection.db;
+    
+    if (!db) {
+      res.status(500).json({ message: 'Error de conexión con la base de datos' });
+      return;
+    }
+    
+    const usersCollection = db.collection('users');
+    
+    // Pas 1: trobar l'usuari per ID
+    const user = await usersCollection.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    
+    if (!user) {
+      res.status(404).json({ message: 'Usuario no encontrado' });
+      return;
+    }
+    
+    // Pas 2: Invertir el valor de visibility
+    const currentVisibility = user.visibility !== undefined ? user.visibility : true;
+    const newVisibility = !currentVisibility;
+    
+    // Pas 3: actualitzar el document
+    await usersCollection.updateOne(
+      { _id: new mongoose.Types.ObjectId(userId) },
+      { $set: { visibility: newVisibility, updatedAt: new Date() } }
+    );
+    
+    // Pas 4: obtenir l'usuari actualitzat
+    const updatedUser = await usersCollection.findOne({ _id: new mongoose.Types.ObjectId(userId) });
+    
+    if (!updatedUser) {
+      res.status(500).json({ message: 'Error al recuperar el usuario actualizado' });
+      return;
+    }
+    
+    // Pas 5: Enviar resposta
+    res.status(200).json({
+      message: `Usuario ${newVisibility ? 'visible' : 'oculto'} correctamente`,
+      user: {
+        id: updatedUser._id,
+        username: updatedUser.username,
+        visibility: newVisibility
+      }
+    });
+  } catch (error) {
+    console.error('Error al cambiar la visibilidad del usuario:', error);
+    res.status(500).json({ message: 'Error al cambiar la visibilidad del usuario' });
   }
 };
