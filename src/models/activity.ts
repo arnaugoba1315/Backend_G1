@@ -71,5 +71,5 @@ export interface IActivity {
     type:"running"|"cycling"|"hiking"|"walking";
 }
 
-const Activity = mongoose.model('Activity',activitySchema);
-export default  Activity;
+const ActivityModel = mongoose.model('Activity',activitySchema);
+export default  ActivityModel;

@@ -41,5 +41,5 @@ export interface IChallenge {
     endDate: Date;
 }
 
-const Challenge = mongoose.model('Challenge', challengeSchema);
-export default Challenge;
+const ChallengeModel = mongoose.model('Challenge', challengeSchema);
+export default ChallengeModel;

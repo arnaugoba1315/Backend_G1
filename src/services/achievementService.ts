@@ -1,18 +1,27 @@
-import Achievement, {IAchievement} from '../models/achievement';
+import AchievementModel, {IAchievement} from '../models/achievement';
 
 
 export const createAchievement = async(newAchievement: IAchievement)=> {
-    return await Achievement.create(newAchievement);
+    return await AchievementModel.create(newAchievement);
 };
 export const getAchievementbyId = async(achievementId: string)=>{
-    return await Achievement.findById(achievementId);
+    return await AchievementModel.findById(achievementId);
 };
 export const getAllAchievement = async()=>{
-    return await Achievement.find();
+    return await AchievementModel.find();
 };
 export const updateAchievement = async(achievementId: string, updatedAchievement: IAchievement)=>{
-    return await Achievement.findByIdAndUpdate(achievementId, updatedAchievement, {new: true});
+    return await AchievementModel.findByIdAndUpdate(achievementId, updatedAchievement, {new: true});
 };
 export const deleteAchievement = async(achievementId: string)=>{
-    return await Achievement.findByIdAndDelete(achievementId);
+    return await AchievementModel.findByIdAndDelete(achievementId);
 };
+export const getAchievementByCondition = async(condition: string)=>{
+    return await AchievementModel.find({condition: condition});
+};
+export const getAchievementByUser=async(userId: string)=>{
+    return await AchievementModel.find({usersUnlocked: userId});
+};
+export const searchAchievements = async(searchText: string)=>{
+    return await AchievementModel.find({name: {$regex: searchText, $options: 'i'}});
+}

@@ -99,5 +99,5 @@ userSchema.pre('find', function() {
     this.set({ updatedAt: new Date() });
   });
 
-const User = mongoose.model<IUser>('User', userSchema);
-export default User;
+const UserModel = mongoose.model<IUser>('User', userSchema);
+export default UserModel;

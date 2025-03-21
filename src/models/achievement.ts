@@ -33,5 +33,5 @@ export interface IAchievement {
     usersUnlocked: mongoose.Types.ObjectId;
 }
 
-const Achievement = mongoose.model('Achievement',achievementSchema);
-export default Achievement;
+const AchievementModel = mongoose.model('Achievement',achievementSchema);
+export default AchievementModel;

@@ -1,40 +1,40 @@
-import Song, {ISong} from '../models/song';
+import SongModel, {ISong} from '../models/song';
 
 
 export const createSong = async (song:ISong) => {
-    const newSong = new Song(song);
+    const newSong = new SongModel(song);
     return await newSong.save();
 };
 
 export const getAllSongs = async () => {
-    return await Song.find();
+    return await SongModel.find();
 };
 
 export const getSongById = async (id:string) => {
-    return await Song.findById(id);
+    return await SongModel.findById(id);
 };
 
 export const getSongByName = async (name:string) => {
-    return await Song.find({title:name});
+    return await SongModel.find({title:name});
 };
 
 export const getSongsByArtist = async (artist:string) => {
-    return await Song.find({artist:artist});
+    return await SongModel.find({artist:artist});
 };
 
 export const getSongsByGenre = async (genre:string) => {
-    return await Song.find({genre:genre});
+    return await SongModel.find({genre:genre});
 };
 
 export const getSymilarBpm = async (bpm:number) => {
-    const songs = await Song.find();
+    const songs = await SongModel.find();
     return songs.filter(song => song.bpm !== undefined && song.bpm !== null && Math.abs(song.bpm - bpm) < 20);
 };
 
 export const updateSong = async (id:string, song:ISong) => {
-    return await Song.findByIdAndUpdate(id,song,{new:true});
+    return await SongModel.findByIdAndUpdate(id,song,{new:true});
 };
 
 export const deleteSong = async (id:string) => {
-    return await Song.findByIdAndDelete(id);
+    return await SongModel.findByIdAndDelete(id);
 };

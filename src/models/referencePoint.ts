@@ -26,5 +26,5 @@ export interface IReferencePoint{
     altitude: number;
 }
 
-const ReferencePoint = mongoose.model('ReferencePoint', referencePointSchema);
-export default ReferencePoint;
+const ReferencePointModel = mongoose.model('ReferencePoint', referencePointSchema);
+export default ReferencePointModel;
