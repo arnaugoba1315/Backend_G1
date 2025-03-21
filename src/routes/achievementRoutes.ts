@@ -44,7 +44,7 @@ const router = Router();
  * @openapi
  * /api/achievements:
  *   post:
- *     summary: Crear un nuevo logro
+ *     summary: Creat a new achievement
  *     tags: [Achievements]
  *     requestBody:
  *       required: true
@@ -141,7 +141,7 @@ router.post('/', achievementController.createAchievementController);
  * @openapi
  * /api/achievements/{id}:
  *   get:
- *     summary: Obtener un logro por su ID
+ *     summary: Get an achievement by ID
  *     tags: [Achievements]
  *     parameters:
  *       - in: path
@@ -211,7 +211,7 @@ router.get('/:id', achievementController.getAchievementbyIdController);
  * @openapi
  * /api/achievements:
  *   get:
- *     summary: Obtener todos los logros
+ *     summary: Get all achievements
  *     tags: [Achievements]
  *     responses:
  *       200:
@@ -286,7 +286,7 @@ router.get('/', achievementController.getAllAchievementController);
  * @openapi
  * /api/achievements/{id}:
  *   put:
- *     summary: Actualizar un logro existente
+ *     summary: Update an existing achievement
  *     tags: [Achievements]
  *     parameters:
  *       - in: path
@@ -384,7 +384,7 @@ router.put('/:id', achievementController.updateAchievementController);
  * @openapi
  * /api/achievements/{id}:
  *   delete:
- *     summary: Eliminar un logro
+ *     summary: Delete an existing achievement
  *     tags: [Achievements]
  *     parameters:
  *       - in: path

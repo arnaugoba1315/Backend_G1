@@ -50,7 +50,7 @@ const router = express.Router();
  * @openapi
  * /api/songs:
  *   post:
- *     summary: Crea una nueva canción
+ *     summary: Create a new song
  *     tags: [Songs]
  *     requestBody:
  *       required: true
@@ -91,7 +91,7 @@ router.post('/', songController.createSongHandler);
  * @openapi
  * /api/songs:
  *   get:
- *     summary: Obtiene todas las canciones
+ *     summary: Get all songs
  *     tags: [Songs]
  *     responses:
  *       201:
@@ -107,7 +107,7 @@ router.get('/', songController.getAllSongsHandler);
  * @openapi
  * /api/songs/{id}:
  *   get:
- *     summary: Obtiene una canción por su ID
+ *     summary: Get a song by its ID
  *     tags: [Songs]
  *     parameters:
  *       - in: path
@@ -130,7 +130,7 @@ router.get('/:id', songController.getSongByIdHandler);
  * @openapi
  * /api/songs/name/{name}:
  *   get:
- *     summary: Obtiene una canción por su nombre
+ *     summary: Get a song by its name
  *     tags: [Songs]
  *     parameters:
  *       - in: path
@@ -153,7 +153,7 @@ router.get('/name/:name', songController.getSongByNameHandler);
  * @openapi
  * /api/songs/artist/{artist}:
  *   get:
- *     summary: Obtiene lista de canciones de un artista
+ *     summary: Get a list of songs by an artist
  *     tags: [Songs]
  *     parameters:
  *       - in: path
@@ -176,7 +176,7 @@ router.get('/artist/:artist', songController.getSongsByArtistHandler);
  * @openapi
  * /api/songs/genre/{genre}:
  *   get:
- *     summary: Obtiene lista de canciones de un género
+ *     summary: Get a list of songs by genre
  *     tags: [Songs]
  *     parameters:
  *       - in: path
@@ -199,7 +199,7 @@ router.get('/genre/:genre', songController.getSongsByGenreHandler);
  * @openapi
  * /api/songs/bpm/{bpm}:
  *   get:
- *     summary: Obtiene lista de canciones con un ritmo similar
+ *     summary: Get a list of songs by similar bpm
  *     tags: [Songs]
  *     parameters:
  *       - in: path
@@ -222,7 +222,7 @@ router.get('/bpm/:bpm', songController.getSymilarBpmHandler);
  * @openapi
  * /api/songs/{id}:
  *   put:
- *     summary: Actualiza una canción por su ID
+ *     summary: Update a song by its ID
  *     tags: [Songs]
  *     parameters:
  *       - in: path
@@ -265,7 +265,7 @@ router.put('/:id', songController.updateSongHandler);
  * @openapi
  * /api/songs/{id}:
  *   delete:
- *     summary: Elimina una canción por su ID
+ *     summary: Delete a song by its ID
  *     tags: [Songs]
  *     parameters:
  *       - in: path

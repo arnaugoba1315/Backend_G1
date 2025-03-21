@@ -55,7 +55,7 @@ const router = express.Router();
  * @openapi
  * /api/challenges:
  *   post:
- *     summary: Crea un nou repte
+ *     summary: Create a new challenge
  *     tags: [Challenges]
  *     requestBody:
  *       required: true
@@ -139,7 +139,7 @@ router.post('/', challengeController.createChallengeController);
  * @openapi
  * /api/challenges/{id}:
  *   get:
- *     summary: Obtener un challenge por su ID
+ *     summary: Get a challenge by its ID
  *     tags: [Challenges]
  *     parameters:
  *       - in: path
@@ -207,7 +207,7 @@ router.get('/:id', challengeController.getChallengeByIdController);
  * @openapi
  * /api/challenges/:
  *   get:
- *     summary: Obtener un challenge por su ID
+ *     summary: Get all challenges
  *     tags: [Challenges]
  *     parameters:
  *       - in: path
@@ -266,7 +266,7 @@ router.get('/', challengeController.getAllChallengesController);
  * @openapi
  * /api/challenges/active:
  *   get:
- *     summary: Obtener todos los challenges activos
+ *     summary: Get all active challenges
  *     tags: [Challenges]
  *     responses:
  *       200:
@@ -338,7 +338,7 @@ router.get('/active', challengeController.getActiveChallengesController);
  * @openapi
  * /api/challenges/inactive:
  *   get:
- *     summary: Obtener todos los challenges inactivos
+ *     summary: Get all inactive challenges
  *     tags: [Challenges]
  *     responses:
  *       200:
@@ -410,7 +410,7 @@ router.get('/inactive', challengeController.getInactiveChallengesController);
  * @openapi
  * /api/challenges/{id}:
  *   put:
- *     summary: Actualizar un challenge existente
+ *     summary: Update a challenge
  *     tags: [Challenges]
  *     parameters:
  *       - in: path
@@ -509,7 +509,7 @@ router.put('/:id', challengeController.updateChallengeController);
  * @openapi
  * /api/challenges/{id}:
  *   delete:
- *     summary: Eliminar un challenge
+ *     summary: Delete a challenge
  *     tags: [Challenges]
  *     parameters:
  *       - in: path
