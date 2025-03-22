@@ -1,5 +1,6 @@
 import express from 'express';
 import * as userController from '../controllers/userController';
+import { AuthController } from '../controllers/auth.controller';
 
 const router = express.Router();
 
@@ -80,7 +81,7 @@ const router = express.Router();
 
 /**
  * @openapi
- * /api/users:
+ * /api/users/register:
  *   post:
  *     summary: Create a new user
  *     tags: [Users]
@@ -113,7 +114,7 @@ const router = express.Router();
  *       500:
  *         description: Error creating user
  */
-router.post('/', userController.createUser);
+router.post('/register', AuthController.register);
 
 /**
  * @openapi
@@ -143,7 +144,7 @@ router.post('/', userController.createUser);
  *       500:
  *         description: Error logging in
  */
-router.post('/login', userController.loginUser);
+router.post('/login', AuthController.login);
 
 /**
  * @openapi
