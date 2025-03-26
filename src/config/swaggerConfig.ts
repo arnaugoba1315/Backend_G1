@@ -11,6 +11,34 @@ const swaggerOptions = {
       version: '1.0.0',
       description: 'API para gestionar actividades deportivas', // Descripción de la API
     },
+
+    tags: [ //Definim les categories para cada una de les rutes per tenir una estructura més ordenada
+      {
+        name: 'Users',
+        description: "Rutes relacionades amb la gestió d'usuaris",
+      },
+      {
+        name: 'Achievements',
+        description: "Rutes relacionades amb els assoliments",
+      },
+      {
+        name: 'Challenges',
+        description: 'Rutes relacionades amb els reptes',
+      },
+      {
+        name: 'Activities',
+        description: 'Rutes relacionades amb les activitats',
+      },
+      {
+        name: 'ReferencePoints',
+        description: 'Rutes relacionades amb els punts de referència',
+      },
+      {
+        name: 'Songs',
+        description: 'Rutes relacionades amb les cançons',
+      }
+    ],
+
     servers: [
       {
         url: `http://localhost:3000`, // El servidor donde la API se ejecuta
