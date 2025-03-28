@@ -13,7 +13,7 @@ export const createActivity = async (userId: string, activityData: Omit<IActivit
 
 // Obtener una actividad por ID
 export const getActivityById = async (activityId: string): Promise<IActivity | null> => {
-    return await ActivityModel.findById(activityId).populate('route').populate('musicPlaylist').populate('user');
+    return await ActivityModel.findById(activityId).populate('route').populate('musicPlaylist').populate('author');
 };
 
 // Obtener todas las actividades de un usuario
@@ -23,7 +23,7 @@ export const getActivitiesByUserId = async (userId: string): Promise<IActivity[]
 
 // Obtener todas las actividades
 export const getAllActivities = async (): Promise<IActivity[]> => {
-    return await ActivityModel.find().populate('route').populate('musicPlaylist').populate('user');
+    return await ActivityModel.find().populate('route').populate('musicPlaylist').populate('author');
 };
 
 // Actualizar una actividad
