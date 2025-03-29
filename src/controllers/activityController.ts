@@ -12,7 +12,7 @@ import { Request, Response } from 'express';
 // Crear una nova activitat
 export const createActivityController = async (req: Request, res: Response) => {
     try {
-        const data = await createActivity(req.body.userId, req.body);
+        const data = await createActivity(req.body.author, req.body);
         res.status(201).json(data);
     } catch (error: any) {
         res.status(500).json({ message: error.message });
