@@ -4,7 +4,7 @@ import mongoose, { Schema, Types, Document } from "mongoose";
 const userSchema = new Schema({
     username: {
         type: String,
-        unique: true,
+        unique: false,
         required: true
     },
     password: {
@@ -13,7 +13,7 @@ const userSchema = new Schema({
     },
     email: {
         type: String,
-        unique: true,
+        unique: false,
         required: true
     },
     profilePicture: {

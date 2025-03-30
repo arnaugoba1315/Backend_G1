@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import User from '../models/user';
+import { deleteActivity } from '../services/activityService';
 import bcrypt from 'bcrypt';
 import * as userService from '../services/userService';
 import mongoose from 'mongoose';
@@ -13,7 +14,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
     
     // Verificar si el usuario ya existe
     const existingUser = await User.findOne({ username });
-    if (existingUser) {
+    if (existingUser && existingUser.visibility !== false) {
       res.status(400).json({ message: 'Username already exists' });
       return;
     }
@@ -255,12 +256,16 @@ export const toggleUserVisibility = async (req: Request, res: Response): Promise
       res.status(404).json({ message: 'Usuario no encontrado' });
       return;
     }
+
+    for (let activity of user.activities) {
+      await deleteActivity(activity._id.toString());
+    }
     
     // Pas 2: Invertir el valor de visibility
     const currentVisibility = user.visibility !== undefined ? user.visibility : true;
     const newVisibility = !currentVisibility;
     
-    // Pas 3: actualitzar el document
+    // Pas 3: actualitzar el document i esborrar les seves activitats
     await usersCollection.updateOne(
       { _id: new mongoose.Types.ObjectId(userId) },
       { $set: { visibility: newVisibility, updatedAt: new Date() } }
