@@ -131,7 +131,7 @@ export const getAllUsers = async (req: Request, res: Response): Promise<void> =>
     }
     
     // Obtener usuarios paginados
-    const result = await userService.getPaginatedUsers(page, limit, includeInvisible);
+    const result = await userService.getPaginatedUsers(page, limit);
     
     res.status(200).json(result);
   } catch (error) {
@@ -203,6 +203,22 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
  * Soft delete - Marcar usuario como no visible en lugar de eliminarlo
  */
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
+  try{
+    const user = await userService.getUserById(req.params.id);
+          if(!user){
+              res.status(401).json({message: `User "${req.params.title}" not found`});
+          }
+          if(user !== null && user.activities){
+            for (let activity of user.activities) {
+              await deleteActivity(activity._id.toString());
+            }
+          }
+          await userService.deleteUser(req.params.id);
+          res.status(201).json(user);
+      }catch(err:any){
+          res.status(500).json({message:"Server error: ", err});
+      }
+      /*
   try {
     const userId = req.params.id;
     
@@ -229,7 +245,7 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
   } catch (error) {
     console.error('Error al ocultar usuario:', error);
     res.status(500).json({ message: 'Error al ocultar usuario' });
-  }
+  }*/
 };
 
 /**
@@ -255,10 +271,6 @@ export const toggleUserVisibility = async (req: Request, res: Response): Promise
     if (!user) {
       res.status(404).json({ message: 'Usuario no encontrado' });
       return;
-    }
-
-    for (let activity of user.activities) {
-      await deleteActivity(activity._id.toString());
     }
     
     // Pas 2: Invertir el valor de visibility

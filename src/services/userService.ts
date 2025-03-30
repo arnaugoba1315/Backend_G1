@@ -4,7 +4,7 @@ import mongoose from 'mongoose';
 /**
  * Obtener usuarios con paginación
  */
-export const getPaginatedUsers = async (page: number = 1, limit: number = 10, includeInvisible: boolean = false): Promise<{
+export const getPaginatedUsers = async (page: number = 1, limit: number = 10): Promise<{
   users: IUser[];
   totalUsers: number;
   totalPages: number;
@@ -13,7 +13,7 @@ export const getPaginatedUsers = async (page: number = 1, limit: number = 10, in
   try {
     const skip = (page - 1) * limit;
     
-    const query = includeInvisible ? {} : { visibility: true };
+    const query = {};
     
     console.log("Consulta MongoDB:", JSON.stringify(query));
     
