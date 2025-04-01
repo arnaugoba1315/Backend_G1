@@ -1,5 +1,7 @@
 import ActivityModel, { IActivity } from "../models/activity";
 import UserModel from "../models/user";
+import mongoose from "mongoose";
+import * as activityHistoryService from './activityHistoryService';
 
 // Crear una nueva actividad y asociarla a un usuario
 export const createActivity = async (userId: string, activityData: Omit<IActivity, 'user'>): Promise<IActivity> => {
@@ -7,6 +9,14 @@ export const createActivity = async (userId: string, activityData: Omit<IActivit
 
     // Agregar la actividad al array de actividades del usuario
     await UserModel.findByIdAndUpdate(userId, { $push: { activities: activity._id } });
+
+    // Registrar en el historial
+    await activityHistoryService.createActivityHistory({
+        activityId: activity._id,
+        userId: new mongoose.Types.ObjectId(userId),
+        changeType: 'create',
+        newValues: activity.toObject() // Convertir a objeto plano para almacenar
+    });
 
     return activity;
 };
@@ -28,14 +38,124 @@ export const getAllActivities = async (): Promise<IActivity[]> => {
 
 // Actualizar una actividad
 export const updateActivity = async (activityId: string, activityData: Partial<IActivity>): Promise<IActivity | null> => {
-    return await ActivityModel.findByIdAndUpdate(activityId, activityData, { new: true });
+    // Obtener la actividad anterior para el historial
+    const previousActivity = await ActivityModel.findById(activityId);
+    
+    if (!previousActivity) {
+        return null;
+    }
+    
+    // Realizar la actualización
+    const updatedActivity = await ActivityModel.findByIdAndUpdate(
+        activityId, 
+        activityData, 
+        { new: true }
+    );
+    
+    if (updatedActivity) {
+        // Determinar qué campos cambiaron
+        const changedFields = Object.keys(activityData).filter(key => {
+            const keyAsKeyof = key as keyof IActivity;
+            const prevValue = previousActivity[keyAsKeyof];
+            const newValue = activityData[keyAsKeyof];
+            
+            // Comparación simple para valores primitivos
+            if (typeof prevValue !== 'object' && typeof newValue !== 'object') {
+                return prevValue !== newValue;
+            }
+            
+            // Para objetos y arrays, usar comparación JSON
+            return JSON.stringify(prevValue) !== JSON.stringify(newValue);
+        });
+        
+        // Registrar en el historial solo si hay cambios
+        if (changedFields.length > 0) {
+            await activityHistoryService.createActivityHistory({
+                activityId: updatedActivity._id,
+                userId: typeof updatedActivity.author === 'object' 
+                    ? updatedActivity.author._id 
+                    : updatedActivity.author,
+                changeType: 'update',
+                changedFields: changedFields,
+                previousValues: previousActivity.toObject(),
+                newValues: updatedActivity.toObject()
+            });
+        }
+    }
+    
+    return updatedActivity;
 };
 
 // Eliminar una actividad y quitar la referencia del usuario
 export const deleteActivity = async (activityId: string): Promise<IActivity | null> => {
-    const activity = await ActivityModel.findByIdAndDelete(activityId);
-    if (activity) {
-        await UserModel.findByIdAndUpdate(activity.author, { $pull: { activities: activityId } });
+    // Obtener la actividad para el historial antes de eliminarla
+    const activity = await ActivityModel.findById(activityId);
+    
+    if (!activity) {
+        return null;
     }
-    return activity;
+    
+    // Eliminar la actividad
+    const deletedActivity = await ActivityModel.findByIdAndDelete(activityId);
+    
+    if (deletedActivity) {
+        // Quitar la referencia del usuario
+        await UserModel.findByIdAndUpdate(
+            deletedActivity.author, 
+            { $pull: { activities: activityId } }
+        );
+        
+        // Registrar en el historial
+        await activityHistoryService.createActivityHistory({
+            activityId: deletedActivity._id,
+            userId: typeof deletedActivity.author === 'object' 
+                ? deletedActivity.author._id 
+                : deletedActivity.author,
+            changeType: 'delete',
+            previousValues: deletedActivity.toObject()
+        });
+    }
+    
+    return deletedActivity;
+};
+
+// Buscar actividades por criterios
+export const searchActivities = async (
+    criteria: any, 
+    page: number = 1, 
+    limit: number = 10, 
+    sortField: string = 'startTime', 
+    sortOrder: 'asc' | 'desc' = 'desc'
+): Promise<{
+    activities: IActivity[];
+    total: number;
+    page: number;
+    pages: number;
+}> => {
+    const skip = (page - 1) * limit;
+    const sortDirection = sortOrder === 'asc' ? 1 : -1;
+    
+    const query = { ...criteria };
+    
+    // Búsqueda por nombre (parcial)
+    if (query.name && typeof query.name === 'string') {
+        query.name = { $regex: query.name, $options: 'i' };
+    }
+    
+    const total = await ActivityModel.countDocuments(query);
+    
+    const activities = await ActivityModel.find(query)
+        .sort({ [sortField]: sortDirection })
+        .skip(skip)
+        .limit(limit)
+        .populate('author', 'username')
+        .populate('route')
+        .populate('musicPlaylist');
+    
+    return {
+        activities,
+        total,
+        page,
+        pages: Math.ceil(total / limit)
+    };
 };
