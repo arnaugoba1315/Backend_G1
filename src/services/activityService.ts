@@ -3,6 +3,17 @@ import UserModel from "../models/user";
 import mongoose from "mongoose";
 import * as activityHistoryService from './activityHistoryService';
 
+// Función auxiliar para normalizar las fechas (eliminar la influencia de zona horaria)
+const normalizeDate = (date: Date | string | undefined): string => {
+  if (!date) return '';
+  
+  // Convertir a objeto Date si es string
+  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  
+  // Extraer solo la parte de fecha y hora, sin la zona horaria
+  return dateObj.toISOString().split('.')[0] + 'Z';
+};
+
 // Crear una nueva actividad y asociarla a un usuario
 export const createActivity = async (userId: string, activityData: Omit<IActivity, 'user'>): Promise<IActivity> => {
     const activity = await ActivityModel.create({ ...activityData, user: userId });
@@ -36,7 +47,7 @@ export const getAllActivities = async (): Promise<IActivity[]> => {
     return await ActivityModel.find().populate('route').populate('musicPlaylist').populate('author');
 };
 
-// Actualizar una actividad
+// Actualizar una actividad - Versión mejorada con corrección de zonas horarias
 export const updateActivity = async (activityId: string, activityData: Partial<IActivity>): Promise<IActivity | null> => {
     // Obtener la actividad anterior para el historial
     const previousActivity = await ActivityModel.findById(activityId);
@@ -53,11 +64,21 @@ export const updateActivity = async (activityId: string, activityData: Partial<I
     );
     
     if (updatedActivity) {
-        // Determinar qué campos cambiaron
+        // Determinar qué campos realmente cambiaron excluyendo campos derivados
         const changedFields = Object.keys(activityData).filter(key => {
+            // Ignorar campos derivados o calculados
+            if (key === 'authorName' || key === '__v') return false;
+            
             const keyAsKeyof = key as keyof IActivity;
             const prevValue = previousActivity[keyAsKeyof];
             const newValue = activityData[keyAsKeyof];
+            
+            // Para fechas, normalizar antes de comparar para evitar problemas de zona horaria
+            if (key === 'startTime' || key === 'endTime') {
+                const normalizedPrev = normalizeDate(prevValue as Date);
+                const normalizedNew = normalizeDate(newValue as Date);
+                return normalizedPrev !== normalizedNew;
+            }
             
             // Comparación simple para valores primitivos
             if (typeof prevValue !== 'object' && typeof newValue !== 'object') {
@@ -68,7 +89,7 @@ export const updateActivity = async (activityId: string, activityData: Partial<I
             return JSON.stringify(prevValue) !== JSON.stringify(newValue);
         });
         
-        // Registrar en el historial solo si hay cambios
+        // Registrar en el historial solo si hay cambios reales
         if (changedFields.length > 0) {
             await activityHistoryService.createActivityHistory({
                 activityId: updatedActivity._id,
