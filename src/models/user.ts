@@ -61,6 +61,12 @@ const userSchema = new Schema({
         type: Boolean,
         default: true,
         required: true
+    },
+    role: {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user',
+        required: true
     }
 }, {
     timestamps: true // This automatically handles createdAt and updatedAt
@@ -83,6 +89,7 @@ export interface IUser extends Document {
     createdAt: Date;
     updatedAt: Date;
     visibility: boolean;
+    role: 'user' | 'admin';
 }
 
 // Modificat: no aplicar el pre-hook quan es demana incloure usuaris invisibles

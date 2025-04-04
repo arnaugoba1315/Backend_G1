@@ -62,6 +62,10 @@ const router = express.Router();
  *         visibility:
  *            type: boolean
  *            description: Indica si l'usuari és visible o no en la base de dades
+ *         role:
+ *            type: string
+ *            enum: [user, admin]
+ *            description: Rol de l'usuari (user o admin)
  *       example:
  *         username: Corredor44858
  *         email: nosequeficar@strava.es
@@ -76,6 +80,7 @@ const router = express.Router();
  *         createdAt: 2025-03-20T09:20:00Z
  *         updatedAt: 2025-03-20T09:20:00Z
  *         visibility: true
+ *         role: user
  */
 
 /**
@@ -105,6 +110,10 @@ const router = express.Router();
  *                 type: string
  *               bio:
  *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *                 description: Rol del usuario (por defecto 'user')
  *     responses:
  *       201:
  *         description: User created successfully
@@ -227,6 +236,10 @@ router.get('/:id', userController.getUserById);
  *                 type: string
  *               bio:
  *                 type: string
+ *               role:
+ *                 type: string
+ *                 enum: [user, admin]
+ *                 description: Rol del usuario (user o admin)
  *     responses:
  *       200:
  *         description: User updated successfully

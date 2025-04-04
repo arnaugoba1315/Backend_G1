@@ -10,12 +10,18 @@ import mongoose from 'mongoose';
  */
 export const createUser = async (req: Request, res: Response): Promise<void> => {
   try {
-    const { username, email, password, profilePicture, bio } = req.body;
+    const { username, email, password, profilePicture, bio, role } = req.body;
     
     // Verificar si el usuario ya existe
     const existingUser = await User.findOne({ username });
     if (existingUser && existingUser.visibility !== false) {
       res.status(400).json({ message: 'Username already exists' });
+      return;
+    }
+    
+    // Validar el rol si se proporciona
+    if (role && !['user', 'admin'].includes(role)) {
+      res.status(400).json({ message: 'Invalid role. Allowed values are "user" or "admin"' });
       return;
     }
     
@@ -37,7 +43,8 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       achievements: [],
       challengesCompleted: [],
       createdAt: new Date(),
-      updatedAt: new Date()
+      updatedAt: new Date(),
+      role: role || 'user' // Si no se proporciona rol, asignar 'user' por defecto
     });
     
     // Guardar usuario en la base de datos
@@ -51,6 +58,7 @@ export const createUser = async (req: Request, res: Response): Promise<void> => 
       profilePicture: newUser.profilePicture,
       bio: newUser.bio,
       level: newUser.level,
+      role: newUser.role,
       createdAt: newUser.createdAt
     };
     
@@ -97,7 +105,8 @@ export const loginUser = async (req: Request, res: Response): Promise<void> => {
       username: user.username,
       email: user.email,
       profilePicture: user.profilePicture,
-      level: user.level
+      level: user.level,
+      role: user.role || 'user' // Incluir el rol en la respuesta
     };
     
     res.status(200).json({
@@ -169,6 +178,12 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
     const userId = req.params.id;
     const updates = req.body;
     
+    // Validar el rol si se está actualizando
+    if (updates.role && !['user', 'admin'].includes(updates.role)) {
+      res.status(400).json({ message: 'Invalid role. Allowed values are "user" or "admin"' });
+      return;
+    }
+    
     // Si se actualiza la contraseña, hashearla
     if (updates.password) {
       const salt = await bcrypt.genSalt(10);
@@ -200,13 +215,14 @@ export const updateUser = async (req: Request, res: Response): Promise<void> => 
 };
 
 /**
- * Soft delete - Marcar usuario como no visible en lugar de eliminarlo
+ * Eliminar un usuario (ahora elimina completamente el usuario y sus actividades)
  */
 export const deleteUser = async (req: Request, res: Response): Promise<void> => {
   try{
     const user = await userService.getUserById(req.params.id);
           if(!user){
               res.status(401).json({message: `User "${req.params.title}" not found`});
+              return;
           }
           if(user !== null && user.activities){
             for (let activity of user.activities) {
@@ -218,34 +234,6 @@ export const deleteUser = async (req: Request, res: Response): Promise<void> => 
       }catch(err:any){
           res.status(500).json({message:"Server error: ", err});
       }
-      /*
-  try {
-    const userId = req.params.id;
-    
-    // En lugar de eliminar, actualizar el campo visibility a false
-    const updatedUser = await User.findByIdAndUpdate(
-      userId,
-      { visibility: false, updatedAt: new Date() },
-      { new: true }
-    );
-    
-    if (!updatedUser) {
-      res.status(404).json({ message: 'Usuario no encontrado' });
-      return;
-    }
-    
-    res.status(200).json({ 
-      message: 'Usuario marcado como no visible correctamente',
-      user: {
-        id: updatedUser._id,
-        username: updatedUser.username,
-        visibility: updatedUser.visibility
-      }
-    });
-  } catch (error) {
-    console.error('Error al ocultar usuario:', error);
-    res.status(500).json({ message: 'Error al ocultar usuario' });
-  }*/
 };
 
 /**
@@ -297,7 +285,8 @@ export const toggleUserVisibility = async (req: Request, res: Response): Promise
       user: {
         id: updatedUser._id,
         username: updatedUser.username,
-        visibility: newVisibility
+        visibility: newVisibility,
+        role: updatedUser.role || 'user'
       }
     });
   } catch (error) {

@@ -53,6 +53,19 @@ export const getPaginatedUsers = async (page: number = 1, limit: number = 10): P
 };
 
 /**
+ * Crear un nuevo usuario con rol especificado
+ */
+export const createUser = async (userData: Partial<IUser>): Promise<IUser> => {
+  // Aseguramos que el rol sea válido o establecemos el valor por defecto
+  if (userData.role && !['user', 'admin'].includes(userData.role)) {
+    userData.role = 'user'; // Si el rol no es válido, asignamos 'user' por defecto
+  }
+  
+  const newUser = new UserModel(userData);
+  return await newUser.save();
+};
+
+/**
  * Obtener un usuario por su ID
  */
 export const getUserById = async (userId: string): Promise<IUser | null> => {
@@ -75,9 +88,14 @@ export const getAllUsers = async (includeInvisible: boolean = false): Promise<IU
 };
 
 /**
- * Actualizar un usuario
+ * Actualizar un usuario, incluyendo su rol
  */
 export const updateUser = async (userId: string, userData: Partial<IUser>): Promise<IUser | null> => {
+  // Validar el rol si se proporciona
+  if (userData.role && !['user', 'admin'].includes(userData.role)) {
+    throw new Error('Rol inválido. Los valores permitidos son "user" o "admin"');
+  }
+  
   return await UserModel.findByIdAndUpdate(
     userId,
     userData,
@@ -154,7 +172,8 @@ export const toggleUserVisibility = async (userId: string): Promise<IUser | null
       challengesCompleted: updatedUser.challengesCompleted || [],
       createdAt: updatedUser.createdAt,
       updatedAt: updatedUser.updatedAt,
-      visibility: updatedUser.visibility
+      visibility: updatedUser.visibility,
+      role: updatedUser.role || 'user'
     } as IUser;
   } catch (error) {
     console.error('Error en toggleUserVisibility:', error);
