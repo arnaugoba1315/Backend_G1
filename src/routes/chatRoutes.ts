@@ -1,73 +1,35 @@
 import express from 'express';
-import * as chatController from '../controllers/chatController';
+import { Request, Response } from 'express';
 
 const router = express.Router();
 
 /**
- * @openapi
- * components:
- *   schemas:
- *     ChatRoom:
- *       type: object
- *       required:
- *         - name
- *         - participants
- *       properties:
- *         name:
- *           type: string
- *           description: Nombre de la sala de chat
- *         description:
- *           type: string
- *           description: Descripción de la sala de chat
- *         participants:
- *           type: array
- *           items:
- *             type: string
- *             format: objectId
- *           description: IDs de los usuarios participantes
- *         createdAt:
- *           type: string
- *           format: date-time
- *           description: Fecha de creación de la sala
- *         lastMessage:
- *           type: string
- *           description: Último mensaje enviado en la sala
- *         lastMessageTime:
- *           type: string
- *           format: date-time
- *           description: Fecha del último mensaje
- *     Message:
- *       type: object
- *       required:
- *         - roomId
- *         - senderId
- *         - content
- *       properties:
- *         roomId:
- *           type: string
- *           format: objectId
- *           description: ID de la sala de chat
- *         senderId:
- *           type: string
- *           format: objectId
- *           description: ID del usuario que envía el mensaje
- *         content:
- *           type: string
- *           description: Contenido del mensaje
- *         timestamp:
- *           type: string
- *           format: date-time
- *           description: Fecha y hora del mensaje
- *         read:
- *           type: boolean
- *           description: Indica si el mensaje ha sido leído
+ * @swagger
+ * /api/chat/rooms:
+ *   get:
+ *     summary: Obtener todas las salas de chat
+ *     tags: [Chat]
+ *     responses:
+ *       200:
+ *         description: Lista de salas de chat
+ *       500:
+ *         description: Error del servidor
  */
+router.get('/rooms', (req: Request, res: Response) => {
+  try {
+    // En una implementación real, esto consultaría una base de datos
+    res.status(200).json([]);
+  } catch (error) {
+    console.error('Error obteniendo salas de chat:', error);
+    res.status(500).json({ message: 'Error obteniendo salas de chat' });
+  }
+});
 
 /**
- * @openapi
+ * @swagger
  * /api/chat/rooms:
  *   post:
- *     summary: Create a new chat room
+ *     summary: Crear una nueva sala de chat
  *     tags: [Chat]
  *     requestBody:
  *       required: true
@@ -81,27 +43,51 @@ const router = express.Router();
  *             properties:
  *               name:
  *                 type: string
- *               description:
- *                 type: string
  *               participants:
  *                 type: array
  *                 items:
  *                   type: string
+ *               description:
+ *                 type: string
  *     responses:
  *       201:
- *         description: Chat room created successfully
- *       400:
- *         description: Invalid data
+ *         description: Sala de chat creada
  *       500:
- *         description: Server error
+ *         description: Error del servidor
  */
-router.post('/rooms', chatController.createChatRoomController);
+router.post('/rooms', (req: Request, res: Response) => {
+  try {
+    const { name, participants, description } = req.body;
+    
+    // Validaciones básicas
+    if (!name || !participants || !Array.isArray(participants) || participants.length === 0) {
+      res.status(400).json({ message: 'Datos de sala inválidos' });
+      return;
+    }
+    
+    // En una implementación real, esto crearía un registro en la base de datos
+    const chatRoom = {
+      _id: Date.now().toString(),
+      name,
+      description: description || '',
+      participants,
+      createdAt: new Date().toISOString(),
+      lastMessage: null,
+      lastMessageTime: null
+    };
+    
+    res.status(201).json(chatRoom);
+  } catch (error) {
+    console.error('Error creando sala de chat:', error);
+    res.status(500).json({ message: 'Error creando sala de chat' });
+  }
+});
 
 /**
- * @openapi
+ * @swagger
  * /api/chat/rooms/user/{userId}:
  *   get:
- *     summary: Get all chat rooms for a user
+ *     summary: Obtener salas de chat de un usuario
  *     tags: [Chat]
  *     parameters:
  *       - in: path
@@ -109,43 +95,42 @@ router.post('/rooms', chatController.createChatRoomController);
  *         required: true
  *         schema:
  *           type: string
- *         description: User ID
  *     responses:
  *       200:
- *         description: List of chat rooms
+ *         description: Lista de salas de chat del usuario
  *       500:
- *         description: Server error
+ *         description: Error del servidor
  */
-router.get('/rooms/user/:userId', chatController.getChatRoomsForUserController);
+router.get('/rooms/user/:userId', (req: Request, res: Response) => {
+  try {
+    const { userId } = req.params;
+    
+    // En una implementación real, esto consultaría una base de datos
+    // Devolver datos de prueba
+    const chatRooms = [
+      {
+        _id: '1',
+        name: 'Sala de Prueba',
+        description: 'Sala de chat para pruebas',
+        participants: [userId, '2', '3'],
+        createdAt: new Date().toISOString(),
+        lastMessage: 'Último mensaje de prueba',
+        lastMessageTime: new Date().toISOString()
+      }
+    ];
+    
+    res.status(200).json(chatRooms);
+  } catch (error) {
+    console.error('Error obteniendo salas de chat del usuario:', error);
+    res.status(500).json({ message: 'Error obteniendo salas de chat' });
+  }
+});
 
 /**
- * @openapi
- * /api/chat/rooms/{id}:
+ * @swagger
+ * /api/chat/rooms/{roomId}:
  *   get:
- *     summary: Get a chat room by ID
- *     tags: [Chat]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Chat room ID
- *     responses:
- *       200:
- *         description: Chat room details
- *       404:
- *         description: Chat room not found
- *       500:
- *         description: Server error
- */
-router.get('/rooms/:id', chatController.getChatRoomByIdController);
-
-/**
- * @openapi
- * /api/chat/messages/{roomId}:
- *   get:
- *     summary: Get messages for a chat room
+ *     summary: Obtener una sala de chat por ID
  *     tags: [Chat]
  *     parameters:
  *       - in: path
@@ -153,59 +138,135 @@ router.get('/rooms/:id', chatController.getChatRoomByIdController);
  *         required: true
  *         schema:
  *           type: string
- *         description: Chat room ID
+ *     responses:
+ *       200:
+ *         description: Datos de la sala de chat
+ *       404:
+ *         description: Sala no encontrada
+ *       500:
+ *         description: Error del servidor
+ */
+router.get('/rooms/:roomId', (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+    
+    // En una implementación real, esto consultaría una base de datos
+    if (roomId === '1') {
+      res.status(200).json({
+        _id: '1',
+        name: 'Sala de Prueba',
+        description: 'Sala de chat para pruebas',
+        participants: ['1', '2', '3'],
+        createdAt: new Date().toISOString(),
+        lastMessage: 'Último mensaje de prueba',
+        lastMessageTime: new Date().toISOString()
+      });
+    } else {
+      res.status(404).json({ message: 'Sala no encontrada' });
+    }
+  } catch (error) {
+    console.error('Error obteniendo sala de chat:', error);
+    res.status(500).json({ message: 'Error obteniendo sala de chat' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/chat/rooms/{roomId}:
+ *   delete:
+ *     summary: Eliminar una sala de chat
+ *     tags: [Chat]
+ *     parameters:
+ *       - in: path
+ *         name: roomId
+ *         required: true
+ *         schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: Sala eliminada
+ *       404:
+ *         description: Sala no encontrada
+ *       500:
+ *         description: Error del servidor
+ */
+router.delete('/rooms/:roomId', (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+    
+    // En una implementación real, esto eliminaría un registro de la base de datos
+    res.status(200).json({ message: 'Sala eliminada correctamente' });
+  } catch (error) {
+    console.error('Error eliminando sala de chat:', error);
+    res.status(500).json({ message: 'Error eliminando sala de chat' });
+  }
+});
+
+/**
+ * @swagger
+ * /api/chat/messages/{roomId}:
+ *   get:
+ *     summary: Obtener mensajes de una sala de chat
+ *     tags: [Chat]
+ *     parameters:
+ *       - in: path
+ *         name: roomId
+ *         required: true
+ *         schema:
+ *           type: string
  *       - in: query
  *         name: limit
  *         schema:
  *           type: integer
- *           default: 50
- *         description: Number of messages to retrieve
+ *         description: Número máximo de mensajes a devolver
  *     responses:
  *       200:
- *         description: List of messages
+ *         description: Mensajes de la sala
+ *       404:
+ *         description: Sala no encontrada
  *       500:
- *         description: Server error
+ *         description: Error del servidor
  */
-router.get('/messages/:roomId', chatController.getMessagesForRoomController);
+router.get('/messages/:roomId', (req: Request, res: Response) => {
+  try {
+    const { roomId } = req.params;
+    const limit = parseInt(req.query.limit as string) || 50;
+    
+    // En una implementación real, esto consultaría una base de datos
+    // Devolver datos de prueba
+    const messages = [
+      {
+        _id: '1',
+        senderId: '1',
+        senderName: 'Usuario 1',
+        content: 'Hola, este es un mensaje de prueba',
+        roomId,
+        timestamp: new Date().toISOString(),
+        read: true
+      },
+      {
+        _id: '2',
+        senderId: '2',
+        senderName: 'Usuario 2',
+        content: 'Bienvenido a la sala de chat',
+        roomId,
+        timestamp: new Date().toISOString(),
+        read: true
+      }
+    ];
+    
+    res.status(200).json(messages);
+  } catch (error) {
+    console.error('Error obteniendo mensajes:', error);
+    res.status(500).json({ message: 'Error obteniendo mensajes' });
+  }
+});
 
 /**
- * @openapi
- * /api/chat/messages:
- *   post:
- *     summary: Send a message (HTTP fallback, primarily done via Socket.IO)
- *     tags: [Chat]
- *     requestBody:
- *       required: true
- *       content:
- *         application/json:
- *           schema:
- *             type: object
- *             required:
- *               - roomId
- *               - senderId
- *               - content
- *             properties:
- *               roomId:
- *                 type: string
- *               senderId:
- *                 type: string
- *               content:
- *                 type: string
- *     responses:
- *       201:
- *         description: Message sent successfully
- *       400:
- *         description: Invalid data
- *       500:
- *         description: Server error
- */
-router.post('/messages', chatController.sendMessageController);
-
-/**
- * @openapi
+ * @swagger
  * /api/chat/messages/read:
  *   post:
- *     summary: Mark messages as read
+ *     summary: Marcar mensajes como leídos
  *     tags: [Chat]
  *     requestBody:
  *       required: true
@@ -223,35 +284,26 @@ router.post('/messages', chatController.sendMessageController);
  *                 type: string
  *     responses:
  *       200:
- *         description: Messages marked as read
- *       400:
- *         description: Invalid data
+ *         description: Mensajes marcados como leídos
  *       500:
- *         description: Server error
+ *         description: Error del servidor
  */
-router.post('/messages/read', chatController.markMessagesAsReadController);
-
-/**
- * @openapi
- * /api/chat/rooms/{id}:
- *   delete:
- *     summary: Delete a chat room
- *     tags: [Chat]
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: Chat room ID
- *     responses:
- *       200:
- *         description: Chat room deleted successfully
- *       404:
- *         description: Chat room not found
- *       500:
- *         description: Server error
- */
-router.delete('/rooms/:id', chatController.deleteChatRoomController);
+router.post('/messages/read', (req: Request, res: Response) => {
+  try {
+    const { roomId, userId } = req.body;
+    
+    // Validaciones básicas
+    if (!roomId || !userId) {
+      res.status(400).json({ message: 'roomId y userId son requeridos' });
+      return;
+    }
+    
+    // En una implementación real, esto actualizaría registros en la base de datos
+    res.status(200).json({ message: 'Mensajes marcados como leídos' });
+  } catch (error) {
+    console.error('Error marcando mensajes como leídos:', error);
+    res.status(500).json({ message: 'Error marcando mensajes como leídos' });
+  }
+});
 
 export default router;

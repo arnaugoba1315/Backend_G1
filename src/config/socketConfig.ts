@@ -1,128 +1,109 @@
+import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import { saveMessage, getMessagesForRoom } from '../services/chatService'; // Importar funciones para manejar mensajes
+import mongoose from 'mongoose';
 
-interface UserConnection {
-  userId: string;
-  socketId: string;
-}
+let io: Server;
 
-// Mantener un registro de usuarios conectados
-const connectedUsers: UserConnection[] = [];
-
-// Configuración de Socket.IO
-const setupSocketIO = (io: Server) => {
-  // Middleware para autenticación (opcional)
-  io.use((socket: Socket, next) => {
-    const userId = socket.handshake.auth.userId;
-    if (!userId) {
-      return next(new Error('Usuario no autenticado'));
-    }
-    // @ts-ignore
-    socket.userId = userId; // Guardar el ID del usuario en el objeto socket
-    next();
+export const initializeSocket = (server: HttpServer): void => {
+  io = new Server(server, {
+    cors: {
+      origin: '*', // En producción, limitar a dominios específicos
+      methods: ['GET', 'POST'],
+    },
   });
 
-  // Evento de conexión
   io.on('connection', (socket: Socket) => {
-    console.log(`Usuario conectado: ${socket.id}`);
-    
-    // @ts-ignore
-    const userId = socket.userId;
-    
-    // Registrar al usuario conectado
-    connectedUsers.push({
-      userId: userId,
-      socketId: socket.id
-    });
-    
-    // Informar a todos los usuarios sobre el nuevo usuario conectado
-    io.emit('user_status', { 
-      userId: userId, 
-      status: 'online',
-      onlineUsers: connectedUsers.map(u => u.userId)
-    });
+    console.log(`Socket conectado: ${socket.id}`);
 
-    // Unirse a una sala de chat
-    socket.on('join_room', async (roomId: string) => {
-      socket.join(roomId);
-      console.log(`Usuario ${userId} unido a la sala ${roomId}`);
+    // Almacenar el ID de usuario si se proporciona
+    if (socket.handshake.auth && socket.handshake.auth.userId) {
+      const userId = socket.handshake.auth.userId;
+      console.log(`Usuario ${userId} conectado`);
       
-      // Obtener mensajes anteriores para esta sala
-      try {
-        const messages = await getMessagesForRoom(roomId);
-        socket.emit('previous_messages', messages);
-      } catch (error) {
-        console.error('Error al obtener mensajes anteriores:', error);
-      }
+      // Almacenar ID de usuario en el socket para uso posterior
+      socket.data.userId = userId;
+      
+      // Emitir lista de usuarios conectados
+      emitOnlineUsers();
+    }
+
+    // Manejar unión a sala de chat
+    socket.on('join_room', (roomId: string) => {
+      socket.join(roomId);
+      console.log(`Socket ${socket.id} unido a la sala ${roomId}`);
     });
 
-    // Recibir y reenviar mensajes
-    socket.on('send_message', async (data: { roomId: string; content: string }) => {
-      try {
-        // Guardar el mensaje en la base de datos
-        const savedMessage = await saveMessage({
-          roomId: data.roomId,
-          senderId: userId,
-          content: data.content,
-          timestamp: new Date()
-        });
-        
-        // Enviar mensaje a todos los miembros de la sala
-        io.to(data.roomId).emit('new_message', savedMessage);
-      } catch (error) {
-        console.error('Error al guardar/enviar mensaje:', error);
-        socket.emit('error', { message: 'Error al enviar mensaje' });
+    // Manejar envío de mensajes
+    socket.on('send_message', (data: { roomId: string; content: string }) => {
+      console.log(`Mensaje recibido: ${data.content} para sala ${data.roomId}`);
+      
+      // Verificar datos necesarios
+      if (!data.roomId || !data.content || !socket.data.userId) {
+        return;
       }
+
+      // Crear objeto de mensaje
+      const message = {
+        id: new mongoose.Types.ObjectId().toString(),
+        senderId: socket.data.userId,
+        senderName: socket.data.username || 'Usuario',
+        content: data.content,
+        roomId: data.roomId,
+        timestamp: new Date(),
+        read: false,
+      };
+
+      // Emitir mensaje a todos los sockets en la sala
+      io.to(data.roomId).emit('new_message', message);
     });
 
-    // Enviar notificación a un usuario específico
-    socket.on('send_notification', (data: { userId: string; type: string; content: string }) => {
-      const targetUser = connectedUsers.find(u => u.userId === data.userId);
-      if (targetUser) {
-        io.to(targetUser.socketId).emit('notification', {
-          type: data.type,
-          content: data.content,
-          from: userId,
-          timestamp: new Date()
-        });
-      }
-    });
-
-    // Manejar escribiendo...
+    // Manejar estado "escribiendo..."
     socket.on('typing', (roomId: string) => {
-      socket.to(roomId).emit('user_typing', { userId });
+      if (!socket.data.userId) return;
+      
+      socket.to(roomId).emit('user_typing', {
+        userId: socket.data.userId,
+        username: socket.data.username || 'Usuario',
+      });
     });
 
     // Manejar desconexión
     socket.on('disconnect', () => {
-      console.log(`Usuario desconectado: ${socket.id}`);
-      
-      // Eliminar de la lista de conectados
-      const index = connectedUsers.findIndex(u => u.socketId === socket.id);
-      if (index !== -1) {
-        connectedUsers.splice(index, 1);
-      }
-      
-      // Informar a todos los usuarios sobre el usuario desconectado
-      io.emit('user_status', { 
-        userId: userId, 
-        status: 'offline',
-        onlineUsers: connectedUsers.map(u => u.userId)
-      });
+      console.log(`Socket desconectado: ${socket.id}`);
+      emitOnlineUsers();
     });
   });
 
-  return io;
+  console.log('Servidor Socket.IO inicializado');
 };
 
-// Función de utilidad para enviar notificaciones desde cualquier parte del código
-export const sendNotificationToUser = (io: Server, userId: string, notification: any) => {
-  const targetUser = connectedUsers.find(u => u.userId === userId);
-  if (targetUser) {
-    io.to(targetUser.socketId).emit('notification', notification);
-    return true;
-  }
-  return false;
+// Función para emitir lista de usuarios en línea
+const emitOnlineUsers = (): void => {
+  const onlineSockets = Array.from(io.sockets.sockets.values());
+  const onlineUsers = onlineSockets
+    .filter(socket => socket.data.userId)
+    .map(socket => socket.data.userId);
+  
+  // Eliminar duplicados (por si un usuario tiene múltiples conexiones)
+  const uniqueOnlineUsers = [...new Set(onlineUsers)];
+  
+  // Emitir a todos los clientes
+  io.emit('user_status', {
+    onlineUsers: uniqueOnlineUsers,
+  });
 };
 
-export default setupSocketIO;
+// Función para enviar notificación a un usuario específico
+export const sendNotificationToUser = (ioInstance: unknown, userId: string, notification: any): void => {
+  if (!io) return;
+  
+  const onlineSockets = Array.from(io.sockets.sockets.values());
+  const userSockets = onlineSockets.filter(socket => socket.data.userId === userId);
+  
+  userSockets.forEach(socket => {
+    socket.emit('notification', notification);
+  });
+};
+
+// Exportar instancia de io para uso en otros archivos
+export const getIO = (): Server | null => io || null;
