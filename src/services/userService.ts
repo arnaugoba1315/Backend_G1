@@ -72,12 +72,7 @@ export const getUserById = async (userId: string): Promise<IUser | null> => {
   return await UserModel.findById(userId);
 };
 
-/**
- * Obtener un usuario por su nombre de usuario
- */
-export const getUserByUsername = async (username: string): Promise<IUser | null> => {
-  return await UserModel.findOne({ username });
-};
+
 
 /**
  * Obtener todos los usuarios
@@ -87,6 +82,40 @@ export const getAllUsers = async (includeInvisible: boolean = false): Promise<IU
   return await UserModel.find(query);
 };
 
+
+/**
+ * Buscar usuarios por texto
+ */
+export const searchUsers = async (searchText: string): Promise<IUser[]> => {
+  try {
+    const query = {
+      username: { $regex: searchText, $options: 'i' },
+      visibility: true // Sólo usuarios visibles
+    };
+    
+    return await UserModel.find(query)
+      .select('-password') // Excluir contraseña
+      .limit(20);
+  } catch (error) {
+    console.error('Error al buscar usuarios:', error);
+    throw error;
+  }
+};
+
+/**
+ * Obtener un usuario por su nombre de usuario
+ */
+export const getUserByUsername = async (username: string): Promise<IUser | null> => {
+  try {
+    return await UserModel.findOne({ 
+      username: username,
+      visibility: true // Sólo usuarios visibles
+    }).select('-password'); // Excluir contraseña
+  } catch (error) {
+    console.error('Error al obtener usuario por nombre:', error);
+    throw error;
+  }
+};
 /**
  * Actualizar un usuario, incluyendo su rol
  */

@@ -171,6 +171,75 @@ export const getUserById = async (req: Request, res: Response): Promise<void> =>
 };
 
 /**
+ * Buscar usuario por nombre de usuario
+ */
+export const getUserByUsername = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const username = req.params.username;
+    
+    const user = await userService.getUserByUsername(username);
+    
+    if (!user) {
+      res.status(404).json({ message: 'Usuario no encontrado' });
+      return;
+    }
+    
+    // Excluir la contraseña de la respuesta
+    const userResponse = {
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      bio: user.bio,
+      level: user.level,
+      totalDistance: user.totalDistance,
+      totalTime: user.totalTime,
+      activities: user.activities,
+      achievements: user.achievements,
+      challengesCompleted: user.challengesCompleted,
+      visibility: user.visibility,
+      role: user.role,
+      createdAt: user.createdAt,
+      updatedAt: user.updatedAt
+    };
+    
+    res.status(200).json(userResponse);
+  } catch (error) {
+    console.error('Error al buscar usuario por nombre:', error);
+    res.status(500).json({ message: 'Error al buscar usuario por nombre' });
+  }
+};
+
+
+
+export const searchUsers = async (req: Request, res: Response): Promise<void> => {
+  try {
+    const query = req.query.query as string || '';
+    
+    if (!query || query.length < 3) {
+      res.status(400).json({ message: 'La consulta de búsqueda debe tener al menos 3 caracteres' });
+      return;
+    }
+    
+    const users = await userService.searchUsers(query);
+    
+    // Excluir contraseñas de la respuesta
+    const usersResponse = users.map(user => ({
+      _id: user._id,
+      username: user.username,
+      email: user.email,
+      profilePicture: user.profilePicture,
+      level: user.level,
+      role: user.role
+    }));
+    
+    res.status(200).json(usersResponse);
+  } catch (error) {
+    console.error('Error al buscar usuarios:', error);
+    res.status(500).json({ message: 'Error al buscar usuarios' });
+  }
+};
+/**
  * Actualizar un usuario
  */
 export const updateUser = async (req: Request, res: Response): Promise<void> => {

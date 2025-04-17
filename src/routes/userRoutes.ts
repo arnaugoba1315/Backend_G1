@@ -329,4 +329,50 @@ router.put('/:id/toggle-visibility', userController.toggleUserVisibility);
  */
 router.post('/register', userController.createUser);
 
+/**
+ * @openapi
+ * /api/users/username/{username}:
+ *   get:
+ *     summary: Get user by username
+ *     tags: [Users]
+ *     parameters:
+ *       - in: path
+ *         name: username
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Username
+ *     responses:
+ *       200:
+ *         description: User data
+ *       404:
+ *         description: User not found
+ *       500:
+ *         description: Error fetching user
+ */
+router.get('/username/:username', userController.getUserByUsername);
+
+/**
+ * @openapi
+ * /api/users/search:
+ *   get:
+ *     summary: Search users by username
+ *     tags: [Users]
+ *     parameters:
+ *       - in: query
+ *         name: query
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: Search query (minimum 3 characters)
+ *     responses:
+ *       200:
+ *         description: List of matching users
+ *       400:
+ *         description: Query too short
+ *       500:
+ *         description: Error searching users
+ */
+router.get('/search', userController.searchUsers);
+
 export default router;
