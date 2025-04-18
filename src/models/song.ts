@@ -40,5 +40,5 @@ export interface ISong{
     bpm?: number;
 }
 
-const Song = mongoose.model('Song', songSchema);
-export default Song;
+const SongModel = mongoose.model('Song', songSchema);
+export default SongModel;

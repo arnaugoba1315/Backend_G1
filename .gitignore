@@ -441,3 +441,4 @@ npm-debug.log
 *.bson
 *.json
 
+package-lock.json

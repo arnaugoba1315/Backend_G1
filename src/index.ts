@@ -2,11 +2,17 @@ import express from 'express';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import cors from 'cors';
+import http from 'http';
 import swaggerJsDoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
 
+// Importar configuración de Socket.IO
+import { initializeSocket } from './config/socketConfig';
+
 // Importar rutas
 import userRoutes from './routes/userRoutes';
+import chatRoutes from './routes/chatRoutes';
+// Importar otras rutas cuando estén disponibles
 
 
 // Cargar variables de entorno
@@ -15,6 +21,11 @@ dotenv.config();
 // Inicializar Express
 const app = express();
 const PORT = process.env.PORT || 3143;
+
+
+// Crear servidor HTTP para Socket.IO
+const server = http.createServer(app);
+
 
 // Middleware
 app.use(cors());
@@ -60,6 +71,12 @@ const swaggerOptions = {
         name: 'Songs',
         description: 'Rutas relacionadas con canciones',
       },
+
+      {
+        name: 'Chat',
+        description: 'Rutas relacionadas con el chat',
+      },
+
     ],
     components: {
       securitySchemes: {
@@ -77,8 +94,12 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsDoc(swaggerOptions);
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-// Rutas añadir las que faltan
+
+// Rutas
 app.use('/api/users', userRoutes);
+app.use('/api/chat', chatRoutes);
+
+
 
 // Ruta raíz
 app.get('/', (req, res) => {
@@ -91,10 +112,16 @@ mongoose
   .then(() => {
     console.log('📊 Conexión exitosa a MongoDB');
     
-    // Iniciar el servidor solo después de conectar a la base de datos
-    app.listen(PORT, () => {
+
+    // Inicializar Socket.IO
+    initializeSocket(server);
+    
+    // Iniciar el servidor HTTP (no app.listen) solo después de conectar a la base de datos
+    server.listen(PORT, () => {
       console.log(`🚀 Servidor ejecutándose en http://localhost:${PORT}`);
       console.log(`📝 Documentación disponible en http://localhost:${PORT}/api-docs`);
+      console.log(`🔌 Socket.IO listo para conexiones`);
+
     });
   })
   .catch((error) => {
