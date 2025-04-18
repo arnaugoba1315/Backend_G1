@@ -1,8 +1,12 @@
+import { Request, Response } from 'express';
+import mongoose from 'mongoose';
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
-import mongoose from 'mongoose';
+import { sendNotificationToUser as importedSendNotificationToUser } from '../config/socketConfig';
+import * as notificationService from '../services/notificationService';
 
 let io: Server;
+const connectedUsers = new Map<string, Socket[]>();
 
 export const initializeSocket = (server: HttpServer): void => {
   io = new Server(server, {
@@ -18,10 +22,18 @@ export const initializeSocket = (server: HttpServer): void => {
     // Almacenar el ID de usuario si se proporciona
     if (socket.handshake.auth && socket.handshake.auth.userId) {
       const userId = socket.handshake.auth.userId;
-      console.log(`Usuario ${userId} conectado`);
+      const username = socket.handshake.auth.username || 'Usuario';
+      console.log(`Usuario ${userId} (${username}) conectado`);
       
-      // Almacenar ID de usuario en el socket para uso posterior
+      // Almacenar datos de usuario en el socket
       socket.data.userId = userId;
+      socket.data.username = username;
+      
+      // Almacenar conexión en nuestro mapa de usuarios conectados
+      if (!connectedUsers.has(userId)) {
+        connectedUsers.set(userId, []);
+      }
+      connectedUsers.get(userId)!.push(socket);
       
       // Emitir lista de usuarios conectados
       emitOnlineUsers();
@@ -34,7 +46,7 @@ export const initializeSocket = (server: HttpServer): void => {
     });
 
     // Manejar envío de mensajes
-    socket.on('send_message', (data: { roomId: string; content: string }) => {
+    socket.on('send_message', async (data: { roomId: string; content: string; id?: string }) => {
       console.log(`Mensaje recibido: ${data.content} para sala ${data.roomId}`);
       
       // Verificar datos necesarios
@@ -44,7 +56,7 @@ export const initializeSocket = (server: HttpServer): void => {
 
       // Crear objeto de mensaje
       const message = {
-        id: new mongoose.Types.ObjectId().toString(),
+        id: data.id || new mongoose.Types.ObjectId().toString(),
         senderId: socket.data.userId,
         senderName: socket.data.username || 'Usuario',
         content: data.content,
@@ -55,6 +67,31 @@ export const initializeSocket = (server: HttpServer): void => {
 
       // Emitir mensaje a todos los sockets en la sala
       io.to(data.roomId).emit('new_message', message);
+      
+      // Obtener participantes de la sala y enviar notificaciones
+      try {
+        // Aquí obtendrías los participantes del room desde la base de datos
+        // Por ejemplo: const room = await ChatRoomModel.findById(data.roomId);
+        
+        // Luego enviar notificación a cada participante que no sea el remitente
+        for (const [userId, sockets] of connectedUsers.entries()) {
+          if (userId !== socket.data.userId && socket.rooms.has(data.roomId)) {
+            // Crear notificación
+            const notification = {
+              userId: userId,
+              type: 'message',
+              content: `Nuevo mensaje de ${socket.data.username} en el chat`,
+              relatedId: data.roomId,
+              timestamp: new Date()
+            };
+            
+            // Crear en la base de datos y enviar a través de Socket.IO
+            await notificationService.createNotification(notification);
+          }
+        }
+      } catch (error) {
+        console.error('Error al enviar notificaciones de mensaje:', error);
+      }
     });
 
     // Manejar estado "escribiendo..."
@@ -70,6 +107,23 @@ export const initializeSocket = (server: HttpServer): void => {
     // Manejar desconexión
     socket.on('disconnect', () => {
       console.log(`Socket desconectado: ${socket.id}`);
+      
+      // Eliminar socket de nuestro mapa de usuarios conectados
+      if (socket.data.userId) {
+        const userId = socket.data.userId;
+        const sockets = connectedUsers.get(userId) || [];
+        const index = sockets.findIndex(s => s.id === socket.id);
+        
+        if (index !== -1) {
+          sockets.splice(index, 1);
+          
+          // Si no quedan sockets para este usuario, eliminarlo del mapa
+          if (sockets.length === 0) {
+            connectedUsers.delete(userId);
+          }
+        }
+      }
+      
       emitOnlineUsers();
     });
   });
@@ -79,26 +133,17 @@ export const initializeSocket = (server: HttpServer): void => {
 
 // Función para emitir lista de usuarios en línea
 const emitOnlineUsers = (): void => {
-  const onlineSockets = Array.from(io.sockets.sockets.values());
-  const onlineUsers = onlineSockets
-    .filter(socket => socket.data.userId)
-    .map(socket => socket.data.userId);
-  
-  // Eliminar duplicados (por si un usuario tiene múltiples conexiones)
-  const uniqueOnlineUsers = [...new Set(onlineUsers)];
+  const onlineUserIds = Array.from(connectedUsers.keys());
   
   // Emitir a todos los clientes
   io.emit('user_status', {
-    onlineUsers: uniqueOnlineUsers,
+    onlineUsers: onlineUserIds,
   });
 };
 
 // Función para enviar notificación a un usuario específico
 export const sendNotificationToUser = (ioInstance: unknown, userId: string, notification: any): void => {
-  if (!io) return;
-  
-  const onlineSockets = Array.from(io.sockets.sockets.values());
-  const userSockets = onlineSockets.filter(socket => socket.data.userId === userId);
+  const userSockets = connectedUsers.get(userId) || [];
   
   userSockets.forEach(socket => {
     socket.emit('notification', notification);
