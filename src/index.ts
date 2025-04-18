@@ -12,6 +12,13 @@ import { initializeSocket } from './config/socketConfig';
 // Importar rutas
 import userRoutes from './routes/userRoutes';
 import chatRoutes from './routes/chatRoutes';
+import songRoutes from './routes/songRoutes';
+import activityRoutes from './routes/activityRoutes';
+import referencePointRoutes from './routes/referencePointRoutes';
+import activityHistoryRoutes from './routes/activityHistoryRoutes';
+import achievementRoutes from './routes/achievementRoutes';
+import challengeRoutes from './routes/challengeRoutes';
+import notificationRoutes from './routes/notificationRoutes';
 // Importar otras rutas cuando estén disponibles
 
 
@@ -76,6 +83,10 @@ const swaggerOptions = {
         name: 'Chat',
         description: 'Rutas relacionadas con el chat',
       },
+      {
+        name: 'notifications',
+        description: 'Rutas relacionadas con las notificaciones',
+      }
 
     ],
     components: {
@@ -98,6 +109,13 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 // Rutas
 app.use('/api/users', userRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/songs', songRoutes);
+app.use('/api/activities', activityRoutes);
+app.use('/api/referencepoints', referencePointRoutes);
+app.use('/api/activity-history', activityHistoryRoutes);
+app.use('/api/achievements', achievementRoutes);
+app.use('/api/challenges', challengeRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 
 
