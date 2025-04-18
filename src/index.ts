@@ -20,7 +20,7 @@ dotenv.config();
 
 // Inicializar Express
 const app = express();
-const PORT = process.env.PORT || 3143;
+const PORT = process.env.PORT || 3000;
 
 
 // Crear servidor HTTP para Socket.IO
@@ -108,7 +108,7 @@ app.get('/', (req, res) => {
 
 // Conexión a MongoDB con manejo mejorado de errores
 mongoose
-  .connect(process.env.MONGO_URI || 'mongodb://localhost:27017/BackendProjecte')
+  .connect(process.env.MONGO_URI || 'mongodb://localhost:27017/ProyectoEA_bd', )
   .then(() => {
     console.log('📊 Conexión exitosa a MongoDB');
     
