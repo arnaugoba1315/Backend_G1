@@ -20,13 +20,13 @@ const router: Router = express.Router();
  *     AuthRegister:
  *       type: object
  *       required:
- *         - name
+ *         - username
  *         - password
  *         - email
  *       properties:
  *         username:
  *           type: string
- *           description: El nombre completo del usuario
+ *           description: El nombre de usuario (obligatorio)
  *         password:
  *           type: string
  *           description: La contraseña del usuario
@@ -35,9 +35,9 @@ const router: Router = express.Router();
  *           description: El correo electrónico del usuario
  * 
  *       example:
- *         username: Usuario Ejemplo
- *         password: contraseña123
- *         email: usuario@example.com
+ *         username: "Usuario Ejemplo"
+ *         password: "contraseña123"
+ *         email: "usuario@example.com"
  *     AuthLogin:
  *       type: object
  *       required:
@@ -51,8 +51,8 @@ const router: Router = express.Router();
  *           type: string
  *           description: La contraseña del usuario
  *       example:
- *         email: usuario@ejemplo.com
- *         password: contraseña123
+ *         email: "usuario@ejemplo.com"
+ *         password: "contraseña123"
  *     RefreshToken:
  *       type: object
  *       required:
@@ -62,7 +62,7 @@ const router: Router = express.Router();
  *           type: string
  *           description: El token de refresco
  *       example:
- *         refreshToken: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+ *         refreshToken: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
  */
 
 /**

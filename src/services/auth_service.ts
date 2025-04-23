@@ -7,7 +7,7 @@ import axios from 'axios';
 /**
  * Registra un nuevo usuario en el sistema
  */
-const registerNewUser = async ({ email, password,  }: IUser) => {
+const registerNewUser = async ({ username, email, password }: IUser) => {
     // Verificamos si el usuario ya existe
     const checkIs = await User.findOne({ email });
     if(checkIs) return "ALREADY_USER";
@@ -17,10 +17,18 @@ const registerNewUser = async ({ email, password,  }: IUser) => {
     
     // Creamos el nuevo usuario
     const registerNewUser = await User.create({ 
+        username, // Aseguramos que username se pasa al modelo
         email,
         password: passHash,
         role: 'user', // Rol por defecto
-        
+        level: 1,
+        totalDistance: 0,
+        totalTime: 0,
+        activities: [],
+        achievements: [],
+        challengesCompleted: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
     });
     
     return registerNewUser;
@@ -29,7 +37,7 @@ const registerNewUser = async ({ email, password,  }: IUser) => {
 /**
  * Autenticación de usuario mediante email y contraseña
  */
-const loginUser = async ({ email, password }: Auth) => {
+const loginUser = async ({ email, password, username }: Auth) => {
     // Verificamos si el usuario existe
     const checkIs = await User.findOne({ email });
     if(!checkIs) return "NOT_FOUND_USER";
@@ -158,9 +166,8 @@ const googleAuth = async (code: string) => {
         // Buscamos o creamos el usuario en nuestra base de datos
         let user = await User.findOne({ 
             $or: [
-                { name: profile.name },
-                { email: profile.email }, 
-                { googleId: profile.id }
+                { username: profile.name },
+                { email: profile.email }
             ] 
         });
 
@@ -170,11 +177,17 @@ const googleAuth = async (code: string) => {
             const randomPassword = Math.random().toString(36).slice(-8);
             const passHash = await encrypt(randomPassword);
             user = await User.create({
-                name: profile.name,
+                username: profile.name,
                 email: profile.email,
                 googleId: profile.id,
                 password: passHash,
-                role: 'user' // Rol por defecto
+                role: 'user', // Rol por defecto
+                level: 1,
+                totalDistance: 0,
+                totalTime: 0,
+                activities: [],
+                achievements: [],
+                challengesCompleted: []
             });
         } else {
             console.log("Usuario existente encontrado:", user.email);

@@ -1,8 +1,8 @@
 import pkg from "jsonwebtoken";
 const { sign, verify } = pkg;
 // Usamos secretos diferentes para cada tipo de token
-const JWT_SECRET = process.env.JWT_SECRET || "token.010101010101";
-const REFRESH_SECRET = process.env.REFRESH_SECRET || "refresh.789789789789"; // Secret diferente
+const JWT_SECRET = process.env.JWT_SECRET || "token.a7a8c3e5f7b9d2e3a1c8b7e5f7a9c2e4a8c7b5e3f7a9";
+const REFRESH_SECRET = process.env.REFRESH_SECRET || "refresh.c8b7e5f7a9c2e4a8c7b5e3f7a9c2e4a8c7b5e3f7a9"; // Secret diferente
 
 // Generamos el token de acceso con datos adicionales en el payload
 const generateToken = (id: string, role: string = "user", name: string = "") => {

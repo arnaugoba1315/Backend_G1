@@ -54,7 +54,7 @@ export const createChatRoom = async (roomData: {
     
     // Emitir evento a todos los participantes
     for (const participantId of roomData.participants) {
-      io.emit(`user:${participantId}:new_room`, {
+      io.to(`user:${participantId}`).emit('new_room', {
         roomId: savedRoom._id,
         name: savedRoom.name,
         participants: savedRoom.participants,
@@ -173,7 +173,7 @@ export const deleteChatRoom = async (roomId: string): Promise<boolean> => {
       // Notificar a todos los clientes que la sala ha sido eliminada
       try {
         const io = getIO();
-        io.emit(`room_deleted:${roomId}`, { roomId });
+        io.to(`room:${roomId}`).emit('room_deleted', { roomId });
       } catch (error) {
         console.error('Error al notificar eliminación de sala por Socket.IO:', error);
       }

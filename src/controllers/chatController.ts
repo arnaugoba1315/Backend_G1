@@ -165,7 +165,7 @@ export const deleteChatRoomController = async (req: Request, res: Response) => {
     // Notificar a todos los clientes que la sala ha sido eliminada
     try {
       const io = getIO();
-      io.emit(`room_deleted`, { roomId });
+      io.sockets.emit(`room_deleted`, { roomId });
     } catch (error) {
       console.error('Error al notificar eliminación de sala por Socket.IO:', error);
     }

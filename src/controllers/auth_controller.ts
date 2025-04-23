@@ -3,6 +3,15 @@ import { registerNewUser, loginUser, refreshUserToken, logoutUser, googleAuth } 
 
 export const registerCtrl = async ({body}: Request, res: Response) => {
     try{
+        // Verificamos que username, email y password estén presentes
+        const { username, email, password } = body;
+        
+        if (!username || !email || !password) {
+            return res.status(400).json({ 
+                message: "Todos los campos (username, email, password) son requeridos" 
+            });
+        }
+        
         const responseUser = await registerNewUser(body);
         res.json(responseUser);
     } catch (error: any){
@@ -11,10 +20,17 @@ export const registerCtrl = async ({body}: Request, res: Response) => {
 };
 
 // En el método loginCtrl
-
 export const loginCtrl = async ({ body }: Request, res: Response) => {
     try {
         const { username, email, password } = body;
+        
+        // Validamos que tengamos al menos email y password
+        if (!email || !password) {
+            return res.status(400).json({ 
+                message: "Email y password son requeridos" 
+            });
+        }
+        
         const responseUser = await loginUser({username, email, password });
 
         if (responseUser === 'INCORRECT_PASSWORD') {
@@ -141,6 +157,3 @@ export const googleAuthCtrl = async(req: Request, res: Response) =>{
     console.log("Redireccionando a:", fullUrl); 
     res.redirect(fullUrl);
 }
-
-
-

@@ -17,12 +17,14 @@ interface Message {
 let io: Server;
 
 export const initializeSocket = (server: HttpServer): void => {
-  io = new Server(server, {
-    cors: {
-      origin: '*', // En producción, limitar a dominios específicos
-      methods: ['GET', 'POST'],
-      credentials: true
-    },
+  io = new Server(server);
+
+  // Configurar CORS explícitamente
+  io.engine.use((req: any, res: any, next: (err?: any) => void) => {
+    res.setHeader('Access-Control-Allow-Origin', '*'); // En producción, limitar a dominios específicos
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
   });
 
   io.on('connection', (socket: Socket) => {
