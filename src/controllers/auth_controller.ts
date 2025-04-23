@@ -14,8 +14,8 @@ export const registerCtrl = async ({body}: Request, res: Response) => {
 
 export const loginCtrl = async ({ body }: Request, res: Response) => {
     try {
-        const { name, email, password } = body;
-        const responseUser = await loginUser({name, email, password });
+        const { username, email, password } = body;
+        const responseUser = await loginUser({username, email, password });
 
         if (responseUser === 'INCORRECT_PASSWORD') {
             return res.status(403).json({ message: 'Contraseña incorrecta' });

@@ -24,23 +24,19 @@ const router: Router = express.Router();
  *         - password
  *         - email
  *       properties:
- *         name:
+ *         username:
  *           type: string
  *           description: El nombre completo del usuario
  *         password:
  *           type: string
  *           description: La contraseña del usuario
- *         age:
- *           type: integer
- *           description: La edad del usuario
- *           default: 0
  *         email:
  *           type: string
  *           description: El correo electrónico del usuario
+ * 
  *       example:
- *         name: Usuario Ejemplo
+ *         username: Usuario Ejemplo
  *         password: contraseña123
- *         age: 30
  *         email: usuario@example.com
  *     AuthLogin:
  *       type: object
