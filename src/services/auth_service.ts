@@ -7,20 +7,28 @@ import axios from 'axios';
 /**
  * Registra un nuevo usuario en el sistema
  */
-const registerNewUser = async ({ email, password,  }: IUser) => {
+const registerNewUser = async (userData: Auth) => {
     // Verificamos si el usuario ya existe
-    const checkIs = await User.findOne({ email });
+    const checkIs = await User.findOne({ email: userData.email });
     if(checkIs) return "ALREADY_USER";
     
     // Encriptamos la contraseña
-    const passHash = await encrypt(password);
+    const passHash = await encrypt(userData.password);
     
     // Creamos el nuevo usuario
     const registerNewUser = await User.create({ 
-        email,
+        username: userData.username, // Explicitly use username from userData
+        email: userData.email,
         password: passHash,
         role: 'user', // Rol por defecto
-        
+        level: 1,
+        totalDistance: 0,
+        totalTime: 0,
+        activities: [],
+        achievements: [],
+        challengesCompleted: [],
+        createdAt: new Date(),
+        updatedAt: new Date()
     });
     
     return registerNewUser;
