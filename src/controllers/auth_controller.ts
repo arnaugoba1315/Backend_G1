@@ -23,6 +23,7 @@ export const registerCtrl = async ({body}: Request, res: Response) => {
 export const loginCtrl = async ({ body }: Request, res: Response) => {
     try {
         const { username, email, password } = body;
+
         
         // Validamos que tengamos al menos email y password
         if (!email || !password) {
@@ -31,6 +32,7 @@ export const loginCtrl = async ({ body }: Request, res: Response) => {
             });
         }
         
+
         const responseUser = await loginUser({username, email, password });
 
         if (responseUser === 'INCORRECT_PASSWORD') {
@@ -46,6 +48,7 @@ export const loginCtrl = async ({ body }: Request, res: Response) => {
             token: responseUser.token,
             refreshToken: responseUser.refreshToken, // Enviamos el refresh token directamente
             user: {
+                _id: responseUser.user._id,
                 name: responseUser.user.username,
                 email: responseUser.user.email,
                 role: responseUser.user.role

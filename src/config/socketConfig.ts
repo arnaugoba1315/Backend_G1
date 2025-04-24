@@ -17,53 +17,56 @@ interface Message {
 let io: Server;
 
 export const initializeSocket = (server: HttpServer): void => {
-  io = new Server(server);
 
-  // Configurar CORS explícitamente
-  io.engine.use((req: any, res: any, next: (err?: any) => void) => {
-    res.setHeader('Access-Control-Allow-Origin', '*'); // En producción, limitar a dominios específicos
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    next();
+  
+
+  io = new Server(server, {
+    cors: {
+      origin: "*", // In production, restrict this to your frontend domain
+      methods: ["GET", "POST"],
+      credentials: true
+    },
+    transports: ['websocket', 'polling'] // Explicitly enable both transports
+
   });
 
   io.on('connection', (socket: Socket) => {
     console.log(`Socket conectado: ${socket.id}`);
 
-    // Registro de usuario al conectar
-    socket.on('register_user', (userData: { userId: string, username: string }) => {
-      const { userId, username } = userData;
-      
-      if (!userId) {
-        console.error('Se intentó registrar un usuario sin ID');
-        return;
-      }
+    // Extract auth data from handshake
+    const { userId, username } = socket.handshake.auth as { 
+      userId?: string, 
+      username?: string 
+    };
 
-      console.log(`Usuario ${username} (${userId}) registrado con socket ${socket.id}`);
+    if (userId) {
+      console.log(`Usuario ${username || 'Desconocido'} (${userId}) registrado con socket ${socket.id}`);
       
-      // Almacenar datos en el socket
+      // Store data in socket
       socket.data.userId = userId;
-      socket.data.username = username;
+      socket.data.username = username || 'Usuario';
       
-      // Registrar en el mapa de usuarios conectados
+      // Register in connected users map
       if (!connectedUsers.has(userId)) {
         connectedUsers.set(userId, [socket.id]);
       } else {
         connectedUsers.get(userId)?.push(socket.id);
       }
       
-      // Emitir lista actualizada de usuarios conectados
+      // Emit updated list of online users
       emitOnlineUsers();
-    });
+    } else {
+      console.log(`Socket ${socket.id} conectado sin identificación de usuario`);
+    }
 
-    // Unirse a una sala de chat
+    // Join a chat room
     socket.on('join_room', (roomId: string) => {
       if (!roomId) return;
       
       socket.join(roomId);
       console.log(`Socket ${socket.id} unido a sala ${roomId}`);
       
-      // Notificar a la sala que un usuario se unió
+      // Notify room that a user joined
       io.to(roomId).emit('user_joined', {
         userId: socket.data.userId,
         username: socket.data.username,
@@ -71,14 +74,14 @@ export const initializeSocket = (server: HttpServer): void => {
       });
     });
 
-    // Enviar mensaje
+    // Send message
     socket.on('send_message', (message: Message) => {
       if (!message.roomId || !message.content) {
-        console.error('Datos de mensaje incompletos');
+        console.error('Datos de mensaje incompletos', message);
         return;
       }
       
-      // Asegurar que el mensaje tenga remitente (desde el socket si no está en el mensaje)
+      // Ensure message has sender (from socket if not in message)
       const finalMessage = {
         ...message,
         senderId: message.senderId || socket.data.userId,
@@ -88,11 +91,11 @@ export const initializeSocket = (server: HttpServer): void => {
       
       console.log(`Mensaje enviado a sala ${finalMessage.roomId}: ${finalMessage.content.substring(0, 30)}...`);
       
-      // Emitir el mensaje a todos en la sala
+      // Emit message to everyone in the room
       io.to(finalMessage.roomId).emit('new_message', finalMessage);
     });
 
-    // Indicar que un usuario está escribiendo
+    // User is typing
     socket.on('typing', (roomId: string) => {
       if (!socket.data.userId || !roomId) return;
       
@@ -103,13 +106,13 @@ export const initializeSocket = (server: HttpServer): void => {
       });
     });
 
-    // Desconexión
+    // Disconnect
     socket.on('disconnect', () => {
       console.log(`Socket desconectado: ${socket.id}`);
       
       const userId = socket.data.userId;
       if (userId) {
-        // Eliminar este socket del mapa de usuarios conectados
+        // Remove this socket from connected users map
         const userSockets = connectedUsers.get(userId);
         if (userSockets) {
           const updatedSockets = userSockets.filter(id => id !== socket.id);
@@ -121,7 +124,7 @@ export const initializeSocket = (server: HttpServer): void => {
           }
         }
         
-        // Emitir lista actualizada de usuarios conectados
+        // Emit updated list of online users
         emitOnlineUsers();
       }
     });
@@ -130,13 +133,13 @@ export const initializeSocket = (server: HttpServer): void => {
   console.log('Servidor Socket.IO inicializado');
 };
 
-// Emitir lista de usuarios conectados
+// Emit list of connected users
 function emitOnlineUsers() {
   const onlineUserIds = Array.from(connectedUsers.keys());
   io.emit('online_users', onlineUserIds);
 }
 
-// Obtener la instancia de Socket.IO
+// Get Socket.IO instance
 export const getIO = (): Server => {
   if (!io) {
     throw new Error('Socket.IO no ha sido inicializado');
