@@ -1,10 +1,17 @@
 import { Server as HttpServer } from 'http';
 import { Server, Socket } from 'socket.io';
+import User from '../models/user';
 
-// Mapa para almacenar los usuarios conectados: userId -> socketId
-const connectedUsers = new Map<string, string[]>();
+// Improved structure to store connected user information
+interface ConnectedUser {
+  socketIds: string[];
+  username: string;
+}
 
-// Estructura para almacenar mensajes temporales
+// Map to store connected users: userId -> ConnectedUser
+const connectedUsers = new Map<string, ConnectedUser>();
+
+// Structure for storing messages
 interface Message {
   id: string;
   roomId: string;
@@ -17,9 +24,6 @@ interface Message {
 let io: Server;
 
 export const initializeSocket = (server: HttpServer): void => {
-
-  
-
   io = new Server(server, {
     cors: {
       origin: "*", // In production, restrict this to your frontend domain
@@ -27,10 +31,9 @@ export const initializeSocket = (server: HttpServer): void => {
       credentials: true
     },
     transports: ['websocket', 'polling'] // Explicitly enable both transports
-
   });
 
-  io.on('connection', (socket: Socket) => {
+  io.on('connection', async (socket: Socket) => {
     console.log(`Socket conectado: ${socket.id}`);
 
     // Extract auth data from handshake
@@ -46,11 +49,35 @@ export const initializeSocket = (server: HttpServer): void => {
       socket.data.userId = userId;
       socket.data.username = username || 'Usuario';
       
-      // Register in connected users map
+      // If username is missing, try to fetch it from database
+      let finalUsername = username;
+      if (!finalUsername || finalUsername === 'Usuario') {
+        try {
+          const user = await User.findById(userId);
+          if (user) {
+            finalUsername = user.username;
+            socket.data.username = finalUsername;
+          }
+        } catch (err) {
+          console.error('Error fetching user data:', err);
+        }
+      }
+      
+      // Register in connected users map with username
       if (!connectedUsers.has(userId)) {
-        connectedUsers.set(userId, [socket.id]);
+        connectedUsers.set(userId, {
+          socketIds: [socket.id],
+          username: finalUsername || 'Usuario'
+        });
       } else {
-        connectedUsers.get(userId)?.push(socket.id);
+        const userData = connectedUsers.get(userId);
+        if (userData) {
+          userData.socketIds.push(socket.id);
+          // Update username if we now have better information
+          if (finalUsername && finalUsername !== 'Usuario') {
+            userData.username = finalUsername;
+          }
+        }
       }
       
       // Emit updated list of online users
@@ -113,12 +140,13 @@ export const initializeSocket = (server: HttpServer): void => {
       const userId = socket.data.userId;
       if (userId) {
         // Remove this socket from connected users map
-        const userSockets = connectedUsers.get(userId);
-        if (userSockets) {
-          const updatedSockets = userSockets.filter(id => id !== socket.id);
+        const userData = connectedUsers.get(userId);
+        if (userData) {
+          const updatedSockets = userData.socketIds.filter(id => id !== socket.id);
           
           if (updatedSockets.length > 0) {
-            connectedUsers.set(userId, updatedSockets);
+            userData.socketIds = updatedSockets;
+            connectedUsers.set(userId, userData);
           } else {
             connectedUsers.delete(userId);
           }
@@ -133,10 +161,16 @@ export const initializeSocket = (server: HttpServer): void => {
   console.log('Servidor Socket.IO inicializado');
 };
 
-// Emit list of connected users
+// Improved: Emit list of connected users with usernames
 function emitOnlineUsers() {
-  const onlineUserIds = Array.from(connectedUsers.keys());
-  io.emit('online_users', onlineUserIds);
+  // Create array of user objects with both ID and username
+  const onlineUsers = Array.from(connectedUsers.entries()).map(([userId, userData]) => ({
+    id: userId,
+    username: userData.username
+  }));
+  
+  console.log('Usuarios conectados:', onlineUsers);
+  io.emit('online_users', onlineUsers);
 }
 
 // Get Socket.IO instance
