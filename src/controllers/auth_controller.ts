@@ -19,11 +19,10 @@ export const registerCtrl = async ({body}: Request, res: Response) => {
     }
 };
 
-// En el método loginCtrl
+// Modificado: Enviar objeto usuario completo en la respuesta
 export const loginCtrl = async ({ body }: Request, res: Response) => {
     try {
         const { username, email, password } = body;
-
         
         // Validamos que tengamos al menos email y password
         if (!email || !password) {
@@ -32,7 +31,6 @@ export const loginCtrl = async ({ body }: Request, res: Response) => {
             });
         }
         
-
         const responseUser = await loginUser({username, email, password });
 
         if (responseUser === 'INCORRECT_PASSWORD') {
@@ -43,21 +41,15 @@ export const loginCtrl = async ({ body }: Request, res: Response) => {
             return res.status(404).json({ message: 'Usuario no encontrado' });
         }
 
-        // En lugar de configurar una cookie, enviamos el refresh token en la respuesta
+        // Enviar el objeto usuario completo en la respuesta
         return res.json({
             token: responseUser.token,
-            refreshToken: responseUser.refreshToken, // Enviamos el refresh token directamente
-            user: {
-                _id: responseUser.user._id,
-                name: responseUser.user.username,
-                email: responseUser.user.email,
-                role: responseUser.user.role
-            }
+            refreshToken: responseUser.refreshToken,
+            user: responseUser.user // Objeto usuario completo
         });
     } catch (error: any) {
         return res.status(500).json({ message: error.message });
     }
-    
 };
 
 // Lo mismo para el método googleAuthCallback
