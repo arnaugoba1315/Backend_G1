@@ -2,6 +2,8 @@ import { Request, Response } from 'express';
 import * as activityTrackingService from '../services/activityTrackingService';
 import ActivityModel from '../models/activity';
 import UserModel from '../models/user';
+import mongoose from 'mongoose';
+import ReferencePointModel from '../models/referencePoint';
 
 // Iniciar una nueva actividad de tracking
 export const startTrackingController = async (req: Request, res: Response): Promise<void> => {
@@ -159,85 +161,97 @@ export const resumeTrackingController = async (req: Request, res: Response): Pro
 
 // Finalizar una actividad de tracking y convertirla en actividad permanente
 export const finishTrackingController = async (req: Request, res: Response): Promise<void> => {
-  try {
-    const { trackingId } = req.params;
-    const { name } = req.body; // Nombre opcional para la actividad
-
-    if (!trackingId) {
-      res.status(400).json({ message: 'Se requiere ID de tracking' });
-      return;
-    }
-
-    const finishedTracking = await activityTrackingService.finishActivityTracking(trackingId);
-
-    if (!finishedTracking) {
-      res.status(404).json({ message: 'Tracking no encontrado o no está activo' });
-      return;
-    }
-
-    // Crear una nueva actividad basada en el tracking completado
     try {
-      const newActivity = new ActivityModel({
-        author: finishedTracking.userId,
-        name: name || `${finishedTracking.activityType.charAt(0).toUpperCase() + finishedTracking.activityType.slice(1)} ${finishedTracking.startTime.toLocaleDateString()}`,
-        startTime: finishedTracking.startTime,
-        endTime: finishedTracking.endTime,
-        duration: finishedTracking.currentDuration / 60, // Convertir a minutos para el modelo de actividad
-        distance: finishedTracking.currentDistance,
-        elevationGain: finishedTracking.elevationGain,
-        averageSpeed: finishedTracking.averageSpeed,
-        type: finishedTracking.activityType,
-        route: finishedTracking.locationPoints.map(point => ({
-          latitude: point.latitude,
-          longitude: point.longitude,
-          altitude: point.altitude || 0
-        }))
-      });
-
-      const savedActivity = await newActivity.save();
-
-      // Actualizar el usuario con la nueva actividad
-      await UserModel.findByIdAndUpdate(
-        finishedTracking.userId,
-        { 
-          $push: { activities: savedActivity._id },
-          $inc: { 
-            totalDistance: finishedTracking.currentDistance,
-            totalTime: finishedTracking.currentDuration / 60 // Convertir a minutos
+      const { trackingId } = req.params;
+      const { name } = req.body; // Nombre opcional para la actividad
+  
+      if (!trackingId) {
+        res.status(400).json({ message: 'Se requiere ID de tracking' });
+        return;
+      }
+  
+      const finishedTracking = await activityTrackingService.finishActivityTracking(trackingId);
+  
+      if (!finishedTracking) {
+        res.status(404).json({ message: 'Tracking no encontrado o no está activo' });
+        return;
+      }
+  
+      // Crear una nueva actividad basada en el tracking completado
+      try {
+        // 1. Primero creamos ReferencePoints para cada punto de la ruta
+        const referencePoints = [];
+        
+        for (const point of finishedTracking.locationPoints) {
+          const refPoint = new ReferencePointModel({
+            latitude: point.latitude,
+            longitude: point.longitude,
+            altitude: point.altitude || 0
+          });
+          
+          const savedRefPoint = await refPoint.save();
+          referencePoints.push(savedRefPoint._id);
+        }
+        
+        // 2. Ahora creamos la actividad con referencias a los puntos creados
+        const newActivity = new ActivityModel({
+          author: finishedTracking.userId,
+          name: name || `${finishedTracking.activityType.charAt(0).toUpperCase() + finishedTracking.activityType.slice(1)} ${finishedTracking.startTime.toLocaleDateString()}`,
+          startTime: finishedTracking.startTime,
+          endTime: finishedTracking.endTime,
+          duration: finishedTracking.currentDuration / 60, // Convertir a minutos para el modelo de actividad
+          distance: finishedTracking.currentDistance,
+          elevationGain: finishedTracking.elevationGain,
+          averageSpeed: finishedTracking.averageSpeed,
+          type: finishedTracking.activityType,
+          route: referencePoints, // Array de ObjectIds de ReferencePoint
+          musicPlaylist: [] // Playlist vacía por defecto
+        });
+  
+        const savedActivity = await newActivity.save();
+  
+        // Actualizar el usuario con la nueva actividad
+        await UserModel.findByIdAndUpdate(
+          finishedTracking.userId,
+          { 
+            $push: { activities: savedActivity._id },
+            $inc: { 
+              totalDistance: finishedTracking.currentDistance,
+              totalTime: finishedTracking.currentDuration / 60 // Convertir a minutos
+            }
           }
-        }
-      );
-
-      res.status(200).json({
-        message: 'Tracking finalizado y actividad creada con éxito',
-        tracking: {
-          id: finishedTracking._id,
-          endTime: finishedTracking.endTime,
-          totalDistance: finishedTracking.currentDistance,
-          totalDuration: finishedTracking.currentDuration
-        },
-        activity: {
-          id: savedActivity._id,
-          name: savedActivity.name
-        }
-      });
-    } catch (activityError: any) {
-      console.error('Error al crear actividad:', activityError);
-      res.status(200).json({
-        message: 'Tracking finalizado pero hubo un error al crear la actividad',
-        tracking: {
-          id: finishedTracking._id,
-          endTime: finishedTracking.endTime,
-          totalDistance: finishedTracking.currentDistance,
-          totalDuration: finishedTracking.currentDuration
-        },
-        error: activityError.message
-      });
+        );
+  
+        res.status(200).json({
+          message: 'Tracking finalizado y actividad creada con éxito',
+          tracking: {
+            id: finishedTracking._id,
+            endTime: finishedTracking.endTime,
+            totalDistance: finishedTracking.currentDistance,
+            totalDuration: finishedTracking.currentDuration
+          },
+          activity: {
+            id: savedActivity._id,
+            name: savedActivity.name
+          }
+        });
+      } catch (activityError: any) {
+        console.error('Error al crear actividad:', activityError);
+        res.status(200).json({
+          message: 'Tracking finalizado pero hubo un error al crear la actividad',
+          tracking: {
+            id: finishedTracking._id,
+            endTime: finishedTracking.endTime,
+            totalDistance: finishedTracking.currentDistance,
+            totalDuration: finishedTracking.currentDuration
+          },
+          error: activityError.message
+        });
+      }
+    } catch (error: any) {
+      console.error('Error al finalizar tracking:', error);
+      res.status(500).json({ message: error.message });
     }
-  } catch (error: any) {
-    console.error('Error al finalizar tracking:', error);
-    res.status(500).json({ message: error.message });
-  }
 };
 
 // Descartar un tracking (eliminar sin convertir en actividad)
