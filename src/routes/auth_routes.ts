@@ -5,7 +5,8 @@ import {
     refreshTokenCtrl, 
     logoutCtrl,
     googleAuthCtrl, 
-    googleAuthCallback  
+    googleAuthCallback ,
+    getUserByIdCtrl 
 } from '../controllers/auth_controller';
 import { checkJwt } from "../middleware/session";
 import { ParamsDictionary } from 'express-serve-static-core';
@@ -232,9 +233,34 @@ router.get('/google/callback', async (req: Request, res: Response) => {
         res.status(500).json({ message: "Internal server error" });
     }
 });
+/**
+ * @swagger
+ * /api/auth/user/{userId}:
+ *   get:
+ *     summary: Obtiene los datos de un usuario
+ *     tags: [Auth]
+ *     parameters:
+ *       - in: path
+ *         name: userId
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del usuario
+ *     responses:
+ *       200:
+ *         description: Datos del usuario obtenidos exitosamente
+ *       404:
+ *         description: Usuario no encontrado
+ *       500:
+ *         description: Error del servidor
+ */
+router.get('/user/:userId', checkJwt, async (req: Request, res: Response) => {
+    try {
+        await getUserByIdCtrl(req, res);
+    } catch (error) {
+        res.status(500).json({ message: "Error interno del servidor" });
+    }
+});
 
 export default router;
 
-function getUserByIdCtrl(req: express.Request<ParamsDictionary, any, any, ParsedQs, Record<string, any>>, res: express.Response<any, Record<string, any>>) {
-    throw new Error('Function not implemented.');
-}

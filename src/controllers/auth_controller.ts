@@ -1,5 +1,7 @@
 import { Request, Response } from "express";
 import { registerNewUser, loginUser, refreshUserToken, logoutUser, googleAuth } from "../services/auth_service";
+import mongoose from "mongoose";
+import User from "../models/user"; 
 
 export const registerCtrl = async ({body}: Request, res: Response) => {
     try{
@@ -152,3 +154,46 @@ export const googleAuthCtrl = async(req: Request, res: Response) =>{
     console.log("Redireccionando a:", fullUrl); 
     res.redirect(fullUrl);
 }
+export const getUserByIdCtrl = async (req: Request, res: Response): Promise<void> => {
+    try {
+        const { userId } = req.params;
+
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            res.status(400).json({
+                success: false,
+                message: "ID de usuario inválido"
+            });
+            return;
+        }
+
+        const user = await User.findById(userId).select('-password -refreshToken');
+
+        if (!user) {
+            res.status(404).json({
+                success: false,
+                message: "Usuario no encontrado"
+            });
+            return;
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {
+                id: user._id,
+                username: user.username,
+                email: user.email,
+                role: user.role,
+                profilePicture: user.profilePicture,
+                createdAt: user.createdAt,
+                updatedAt: user.updatedAt
+            }
+        });
+    } catch (error) {
+        console.error('Error en getUserByIdCtrl:', error);
+        res.status(500).json({
+            success: false,
+            message: "Error al obtener datos del usuario",
+            error: error instanceof Error ? error.message : 'Error desconocido'
+        });
+    }
+};

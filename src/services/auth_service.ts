@@ -3,6 +3,7 @@ import { generateToken, generateRefreshToken, verifyRefreshToken } from "../util
 import User, { IUser } from "../models/user";
 import { Auth } from "../models/auth_model";
 import axios from 'axios';
+import mongoose from "mongoose";
 
 /**
  * Registra un nuevo usuario en el sistema
@@ -215,5 +216,26 @@ const googleAuth = async (code: string) => {
         throw new Error('Error en autenticación con Google');
     }
 };
+/**
+ * Obtiene un usuario por su ID
+ */
+const getUserById = async (userId: string): Promise<IUser | null> => {
+    try {
+        // Validar formato del ID
+        if (!mongoose.Types.ObjectId.isValid(userId)) {
+            return null;
+        }
 
-export { registerNewUser, loginUser, refreshUserToken, logoutUser, googleAuth };
+        // Buscar usuario excluyendo campos sensibles
+        const user = await User.findById(userId)
+            .select('-password -refreshToken')
+            .lean();
+
+        return user;
+    } catch (error) {
+        console.error('Error en getUserById:', error);
+        return null;
+    }
+};
+
+export { registerNewUser, loginUser, refreshUserToken, logoutUser, googleAuth, getUserById };
