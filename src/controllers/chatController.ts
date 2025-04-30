@@ -1,8 +1,5 @@
-// src/controllers/chatController.ts (archivo completo)
 import { Request, Response } from 'express';
 import * as chatService from '../services/chatService';
-import * as notificationService from '../services/notificationService';
-import * as userService from '../services/userService';
 import { getIO } from '../config/socketConfig';
 
 // Crear una sala de chat
@@ -103,48 +100,19 @@ export const sendMessageController = async (req: Request, res: Response) => {
       content
     });
     
-    // Obtener información de la sala y el remitente para las notificaciones
-    const chatRoom = await chatService.getChatRoomById(roomId);
-    const sender = await userService.getUserById(senderId);
-    
-    if (chatRoom && sender) {
-      // Notificar a través de Socket.IO
-      try {
-        const io = getIO();
-        io.to(roomId).emit('new_message', {
-          id: message._id,
-          roomId: message.roomId,
-          senderId: message.senderId,
-          content: message.content,
-          timestamp: message.timestamp,
-          readBy: message.readBy
-        });
-      } catch (error) {
-        console.error('Error al enviar mensaje por Socket.IO:', error);
-      }
-      
-      // Enviar notificaciones a todos los participantes excepto al remitente
-      for (const participantId of chatRoom.participants) {
-        // No enviar notificación al remitente
-        if (participantId.toString() !== senderId) {
-          try {
-            await notificationService.createNotification({
-              userId: participantId.toString(),
-              type: 'chat_message',
-              title: chatRoom.isGroup ? `Nuevo mensaje en ${chatRoom.name}` : `Mensaje de ${sender.username}`,
-              message: content.length > 50 ? `${content.substring(0, 50)}...` : content,
-              data: {
-                roomId: roomId,
-                senderId: senderId,
-                senderName: sender.username,
-                isGroup: chatRoom.isGroup
-              }
-            });
-          } catch (notifError) {
-            console.error('Error al enviar notificación de chat:', notifError);
-          }
-        }
-      }
+    // Notificar a través de Socket.IO
+    try {
+      const io = getIO();
+      io.to(roomId).emit('new_message', {
+        id: message._id,
+        roomId: message.roomId,
+        senderId: message.senderId,
+        content: message.content,
+        timestamp: message.timestamp,
+        readBy: message.readBy
+      });
+    } catch (error) {
+      console.error('Error al enviar mensaje por Socket.IO:', error);
     }
     
     res.status(201).json(message);
